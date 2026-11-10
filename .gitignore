@@ -1,0 +1,21 @@
+# CMake build directories
+/build/
+/build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+
+# Compiler outputs
+*.o
+*.a
+*.so
+*.exe
+
+# VS Code local settings
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
