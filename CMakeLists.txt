@@ -10,6 +10,25 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Core library
+add_library(cfd_core
+    src/mesh/StructuredMesh.cpp
+)
+
+# Headers
+target_include_directories(cfd_core
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Main application
 add_executable(CFD_solver
     apps/main.cpp
 )
+
+# Link the core library to the main application
+target_link_libraries(CFD_solver
+    PRIVATE
+        cfd_core
+)
+
+
