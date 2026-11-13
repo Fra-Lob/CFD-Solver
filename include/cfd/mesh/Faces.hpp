@@ -14,39 +14,52 @@ namespace cfd {
     private:
         // Connectivity
         std::vector<std::array<std::size_t, 4>> Nodes_; // Nodes in each face
-        std::vector<std::size_t> Owner_; // Owner cell for each face
-        std::vector<std::size_t> Neighbor_; // Neighbor cell for each face
+        std::vector<std::size_t> Owners_; // Owner cell for each face
+        std::vector<std::size_t> Neighbors_; // Neighbor cell for each face
 
         // Geometry
-        std::vector<double> CenterX_; // X coordinate of face center
-        std::vector<double> CenterY_; // Y coordinate of face center
-        std::vector<double> CenterZ_; // Z coordinate of face center
-        std::vector<double> Area_; // Area of each face
-        std::vector<double> AreaX_; // X component of face area
-        std::vector<double> AreaY_; // Y component of face area
-        std::vector<double> AreaZ_; // Z component of face area
+        std::vector<double> CentersX_; // X coordinate of face center
+        std::vector<double> CentersY_; // Y coordinate of face center
+        std::vector<double> CentersZ_; // Z coordinate of face center
+        std::vector<double> Areas_; // Area of each face
+        std::vector<double> AreasX_; // X component of face area
+        std::vector<double> AreasY_; // Y component of face area
+        std::vector<double> AreasZ_; // Z component of face area
 
         // Boundary
-        std::vector<std::size_t> BoundaryPatchId_; // Boundary type for each face
+        std::vector<std::size_t> BoundaryPatchIds_; // Boundary type for each face
 
     public:
         // Adding faces
-        void addFace(const std::array<std::size_t, 4>& nodes, 
+        void addByNodes(const std::array<std::size_t, 4>& nodes, 
                         std::size_t owner, 
                         std::size_t neighbor = INVALID_ID,
                         std::size_t patchId = INVALID_ID) {
             Nodes_.push_back(nodes);
-            Owner_.push_back(owner);
-            Neighbor_.push_back(neighbor);
-            BoundaryPatchId_.push_back(patchId);
+            Owners_.push_back(owner);
+            Neighbors_.push_back(neighbor);
+            BoundaryPatchIds_.push_back(patchId);
+        }
+
+        void setNeighbor(std::size_t faceId, std::size_t neighbor) {
+            if (faceId >= Neighbors_.size()) {
+                throw std::out_of_range("Face ID out of range");
+            }
+            if (Owners_[faceId] == neighbor) {
+                throw std::invalid_argument("Neighbor cannot be the same as owner");
+            }
+            if (Neighbors_[faceId] != INVALID_ID) {
+                throw std::logic_error("Neighbor already set for this face");
+            }
+            Neighbors_[faceId] = neighbor;
         }
 
         // Getters
-        std::size_t getFacesNumber() const {
+        std::size_t getNumber() const {
             return Nodes_.size();
         }
 
-        std::array<std::size_t, 4> getFaceNodes(std::size_t index) const {
+        std::array<std::size_t, 4> getNodes(std::size_t index) const {
             if (index >= Nodes_.size()) {
                 throw std::out_of_range("Face index out of range");
             }
@@ -57,30 +70,30 @@ namespace cfd {
             if (index >= Nodes_.size()) {
                 throw std::out_of_range("Face index out of range");
             }
-            return Owner_[index];
+            return Owners_[index];
         }
 
         std::size_t getNeighbor(std::size_t index) const {
             if (index >= Nodes_.size()) {
                 throw std::out_of_range("Face index out of range");
             }
-            return Neighbor_[index];
+            return Neighbors_[index];
         }
 
         std::size_t getBoundaryPatchId(std::size_t index) const {
             if (index >= Nodes_.size()) {
                 throw std::out_of_range("Face index out of range");
             }
-            return BoundaryPatchId_[index];
+            return BoundaryPatchIds_[index];
         }
 
         // Boundary check
-        bool isBoundaryFace(std::size_t index) const {
+        bool isBoundary(std::size_t index) const {
             if (index >= Nodes_.size()) {
                 throw std::out_of_range("Face index out of range");
             }
 
-            return Neighbor_[index] == INVALID_ID;
+            return Neighbors_[index] == INVALID_ID;
         }
     };
 }

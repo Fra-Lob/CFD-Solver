@@ -12,7 +12,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Core library
 add_library(cfd_core
-    src/mesh/StructuredMesh.cpp
+    src/meshio/MeshGenerator.cpp
+    src/mesh/ConnectivityBuilder.cpp
 )
 
 # Headers
@@ -41,3 +42,17 @@ target_link_libraries(test_Mesh PRIVATE cfd_core)
 add_test(
     NAME Mesh
     COMMAND test_Mesh)
+
+# Mesh generator
+add_executable(test_MeshGenerator tests/test_MeshGenerator.cpp)
+target_link_libraries(test_MeshGenerator PRIVATE cfd_core)
+add_test(
+    NAME MeshGenerator
+    COMMAND test_MeshGenerator)
+
+# Mesh connectivity
+add_executable(test_MeshConnectivity tests/test_MeshConnectivity.cpp)
+target_link_libraries(test_MeshConnectivity PRIVATE cfd_core)
+add_test(
+    NAME MeshConnectivity
+    COMMAND test_MeshConnectivity)
