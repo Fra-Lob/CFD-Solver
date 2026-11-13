@@ -31,20 +31,13 @@ target_link_libraries(CFD_solver
         cfd_core
 )
 
+# ============================================================================================== #
 # Enable testing
 enable_testing()
 
-# StructuredMesh tests
-add_executable(test_StructuredMesh
-    tests/test_StructuredMesh.cpp
-)
-
-target_link_libraries(test_StructuredMesh
-    PRIVATE
-        cfd_core
-)
-
+# Mesh tests
+add_executable(test_Mesh tests/test_Mesh.cpp)
+target_link_libraries(test_Mesh PRIVATE cfd_core)
 add_test(
-    NAME StructuredMesh
-    COMMAND test_StructuredMesh
-)
+    NAME Mesh
+    COMMAND test_Mesh)

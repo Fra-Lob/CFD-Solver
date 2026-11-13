@@ -1,11 +1,9 @@
 #pragma once // Avoid multiple inclusions of this header file
 #include <array>
 
-namespace cfd
-{
+namespace cfd {
 
-    class StructuredMesh
-    {
+    class StructuredMesh {
     private:
     // Number of cells in each direction
         int nx_;

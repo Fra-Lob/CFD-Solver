@@ -1,8 +1,8 @@
 #include <cfd/mesh/StructuredMesh.hpp>
 #include <stdexcept>
 
-namespace cfd
-{
+namespace cfd {
+    
     StructuredMesh::StructuredMesh(int nx, int ny, int nz): nx_(nx), ny_(ny), nz_(nz) {
         if (nx <= 0 || ny <= 0 || nz <= 0) {
             throw std::invalid_argument("Number of cells in each direction must be positive.");
