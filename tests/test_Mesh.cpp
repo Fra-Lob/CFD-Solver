@@ -52,7 +52,7 @@ void testFaceAddition() {
     assert(mesh.faces.getNeighbor(0) == 1);
     assert((mesh.faces.getNodes(1) == std::array<std::size_t, 4>{4, 5, 6, 7}));
     assert(mesh.faces.getOwner(1) == 1);
-    assert(mesh.faces.getNeighbor(1) == cfd::INVALID_ID); // Boundary face
+    assert(mesh.faces.getNeighbor(1) == cfd::constants::INVALID_ID); // Boundary face
 }
 
 void testInvalidFaceIndex() {

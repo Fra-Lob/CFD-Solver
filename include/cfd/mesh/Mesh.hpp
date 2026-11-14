@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cfd/utils/Math.hpp>
 #include <cfd/mesh/Nodes.hpp>
 #include <cfd/mesh/Faces.hpp>
 #include <cfd/mesh/Cells.hpp>

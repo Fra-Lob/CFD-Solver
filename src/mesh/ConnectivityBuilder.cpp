@@ -24,19 +24,19 @@ namespace cfd {
                 std::array<std::size_t, 4> sortedFaceNodes = faceNodes;
                 std::sort(sortedFaceNodes.begin(), sortedFaceNodes.end());
 
+                std::size_t faceId;
                 auto it = faceMap.find(sortedFaceNodes);
                 if (it == faceMap.end()) {
                     // Face not found, add it to the map with the current cell as owner
-                    std::size_t faceId = mesh.faces.getNumber();
+                    faceId = mesh.faces.getNumber();
                     mesh.faces.addByNodes(faceNodes, cellId);
                     faceMap[sortedFaceNodes] = faceId;
-                    mesh.cells.setFace(cellId, faceId, localFaceId);
                 } else {
                     // Face found, set the neighbor for the existing face
-                    std::size_t ownerCellId = it->second;
-                    mesh.faces.setNeighbor(it->second, cellId);
-                    mesh.cells.setFace(cellId, it->second, localFaceId);
+                    faceId = it->second;
+                    mesh.faces.setNeighbor(faceId, cellId);
                 }
+                mesh.cells.setFace(cellId, faceId, localFaceId);
                 localFaceId++;
             }
         }
