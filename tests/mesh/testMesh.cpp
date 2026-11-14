@@ -26,11 +26,11 @@ void testMesh(const cfd::MeshConfig& config)
 int main()
 {
     try {
-        testMesh({1.0, 1.0, 1.0, 1, 1, 1});
-        testMesh({2.0, 3.0, 4.0, 2, 1, 1});
-        testMesh({2.0, 3.0, 4.0, 2, 2, 2});
-        testMesh({2.0, 3.0, 4.0, 4, 3, 2});
-        testMesh({2.0, 3.0, 4.0, 10, 8, 6});
+        testMesh({cfd::MeshType::Cartesian, 3, {1.0, 1.0, 1.0}, 1, 1, 1});
+        testMesh({cfd::MeshType::Cartesian, 3, {2.0, 3.0, 4.0}, 2, 1, 1});
+        testMesh({cfd::MeshType::Cartesian, 3, {2.0, 3.0, 4.0}, 2, 2, 2});
+        testMesh({cfd::MeshType::Cartesian, 3, {2.0, 3.0, 4.0}, 4, 3, 2});
+        testMesh({cfd::MeshType::Cartesian, 3, {2.0, 3.0, 4.0}, 10, 8, 6});
 
         std::cout << "\nAll mesh tests passed!\n";
         return 0;

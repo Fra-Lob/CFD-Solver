@@ -33,8 +33,19 @@ void VTKWriter::write(const Mesh& mesh, const std::string& filename)
 
     file << "<?xml version=\"1.0\"?>\n"
          << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n"
-         << "  <UnstructuredGrid>\n"
-         << "    <Piece NumberOfPoints=\"" << numberOfPoints
+         << "  <UnstructuredGrid>\n";
+    if (mesh.hasProperties()) {
+        file << "    <FieldData>\n"
+             << "      <DataArray type=\"UInt8\" Name=\"cfd_mesh_type\" NumberOfTuples=\"1\" format=\"ascii\">"
+             << static_cast<unsigned>(mesh.getType()) << "</DataArray>\n"
+             << "      <DataArray type=\"UInt8\" Name=\"cfd_mesh_dimension\" NumberOfTuples=\"1\" format=\"ascii\">"
+             << mesh.getDimension() << "</DataArray>\n"
+             << "      <DataArray type=\"Float64\" Name=\"cfd_mesh_domain\" NumberOfComponents=\""
+             << mesh.getDimension() << "\" NumberOfTuples=\"1\" format=\"ascii\">";
+        for (double value : mesh.getDomain()) file << value << ' ';
+        file << "</DataArray>\n    </FieldData>\n";
+    }
+    file << "    <Piece NumberOfPoints=\"" << numberOfPoints
          << "\" NumberOfCells=\"" << numberOfCells << "\">\n"
          << "      <Points>\n"
          << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n";

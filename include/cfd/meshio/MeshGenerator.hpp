@@ -8,13 +8,16 @@ namespace cfd
 
 struct MeshConfig
 {
-    double Lx, Ly, Lz;
-    std::size_t Nx, Ny, Nz;
+    MeshType type = MeshType::Unknown;
+    unsigned dimension = 0;
+    std::vector<double> domain;
+    std::size_t Nx = 0, Ny = 0, Nz = 0;
 };
 
 class MeshGenerator
 {
 public:
+    // Only Cartesian 3D generation is implemented; other descriptors are rejected.
     static Mesh generate(const MeshConfig& config);
 };
 

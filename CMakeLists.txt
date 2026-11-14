@@ -20,6 +20,7 @@ add_library(cfd_core
     src/meshio/VTKReader.cpp
     src/mesh/ConnectivityBuilder.cpp
     src/mesh/GeometryProcessor.cpp
+    src/mesh/BoundaryPatchBuilder.cpp
 )
 
 # Headers
@@ -62,4 +63,8 @@ add_test(NAME Mesh COMMAND TestMesh.exe)
 add_executable(TestVTKIO.exe tests/mesh/testVTKIO.cpp)
 target_link_libraries(TestVTKIO.exe PRIVATE cfd_core)
 add_test(NAME VTKIO COMMAND TestVTKIO.exe)
+
+add_executable(TestMeshProperties tests/mesh/testMeshProperties.cpp)
+target_link_libraries(TestMeshProperties PRIVATE cfd_core)
+add_test(NAME MeshProperties COMMAND TestMeshProperties)
 

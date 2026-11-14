@@ -27,9 +27,11 @@ void testGenerator(
     require(mesh.cells.getNumber() == expectedCells,
             "Generator: incorrect number of cells");
 
-    const double dx = config.Lx / nx;
-    const double dy = config.Ly / ny;
-    const double dz = config.Lz / nz;
+    require(mesh.getType() == config.type && mesh.getDimension() == config.dimension &&
+            mesh.getDomain() == config.domain, "Generator: mesh properties");
+    const double dx = config.domain[0] / nx;
+    const double dy = config.domain[1] / ny;
+    const double dz = config.domain[2] / nz;
 
     // Check node numbering and coordinates
     for (std::size_t k = 0; k <= nz; ++k) {

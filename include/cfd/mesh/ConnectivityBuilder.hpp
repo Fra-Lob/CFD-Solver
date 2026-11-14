@@ -2,6 +2,9 @@
 
 #include <cfd/mesh/Mesh.hpp>
 
+#include <map>
+#include <algorithm>
+
 namespace cfd {
 
 class MeshConnectivityBuilder

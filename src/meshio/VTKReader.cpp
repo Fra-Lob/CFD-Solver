@@ -1,20 +1,4 @@
 #include <cfd/meshio/VTKReader.hpp>
-#include <cfd/mesh/ConnectivityBuilder.hpp>
-#include <cfd/mesh/GeometryProcessor.hpp>
-
-#include <algorithm>
-#include <charconv>
-#include <cmath>
-#include <fstream>
-#include <iterator>
-#include <limits>
-#include <locale>
-#include <map>
-#include <sstream>
-#include <stdexcept>
-#include <string_view>
-#include <type_traits>
-#include <vector>
 
 namespace cfd {
 namespace {
@@ -187,7 +171,7 @@ std::vector<T> values(const Element& array, std::size_t count)
     return result;
 }
 
-const Element& namedArray(const Element& cells, const std::string& name)
+const Element* findArray(const Element& cells, const std::string& name)
 {
     const Element* result = nullptr;
     for (const auto& array : cells.children) {
@@ -196,9 +180,40 @@ const Element& namedArray(const Element& cells, const std::string& name)
             result = &array;
         }
     }
+    return result;
+}
+
+const Element& namedArray(const Element& cells, const std::string& name)
+{
+    const auto result = findArray(cells, name);
     if (!result) fail("missing DataArray " + name);
     checkArray(*result, 1, false);
     return *result;
+}
+
+void readProperties(const Element& grid, Mesh& mesh)
+{
+    const Element* field = nullptr;
+    for (const auto& child : grid.children) {
+        if (child.name == "FieldData") {
+            if (field) fail("duplicate FieldData");
+            field = &child;
+        }
+    }
+    if (!field) return; // Older VTU files have no domain metadata.
+    const auto type = findArray(*field, "cfd_mesh_type");
+    const auto dimension = findArray(*field, "cfd_mesh_dimension");
+    const auto domain = findArray(*field, "cfd_mesh_domain");
+    if (!type && !dimension && !domain) return;
+    if (!type || !dimension || !domain) fail("incomplete mesh properties");
+    checkArray(*type, 1, false);
+    checkArray(*dimension, 1, false);
+    const auto t = values<std::size_t>(*type, 1)[0];
+    const auto d = values<std::size_t>(*dimension, 1)[0];
+    if (t < 1 || t > 3 || d < 1 || d > 3) fail("invalid mesh type or dimension");
+    checkArray(*domain, d, true);
+    mesh.setProperties(static_cast<MeshType>(t), static_cast<unsigned>(d), values<double>(*domain, d));
+    mesh.requireCartesian3D(); // Current reader/processors support this case only.
 }
 
 // VTU has no structured dimensions. Recover them only after checking the
@@ -240,7 +255,8 @@ Mesh VTKReader::read(const std::string& filename)
         const auto root = XMLParser(xml).parse();
         if (root.name != "VTKFile" || root.attribute("type") != "UnstructuredGrid")
             fail("expected VTK UnstructuredGrid");
-        const auto& piece = root.child("UnstructuredGrid").child("Piece");
+        const auto& grid = root.child("UnstructuredGrid");
+        const auto& piece = grid.child("Piece");
         const auto numberOfPoints = integer(piece.attribute("NumberOfPoints"));
         const auto numberOfCells = integer(piece.attribute("NumberOfCells"));
         const auto& points = piece.child("Points").child("DataArray");
@@ -252,6 +268,7 @@ Mesh VTKReader::read(const std::string& filename)
         const auto types = values<std::size_t>(namedArray(cells, "types"), numberOfCells);
 
         Mesh mesh;
+        readProperties(grid, mesh);
         for (std::size_t p = 0; p < numberOfPoints; ++p)
             mesh.nodes.addCoordinates(coordinates[3 * p], coordinates[3 * p + 1], coordinates[3 * p + 2]);
         for (std::size_t c = 0; c < numberOfCells; ++c) {
@@ -268,10 +285,27 @@ Mesh VTKReader::read(const std::string& filename)
         recoverDimensions(mesh);
         MeshConnectivityBuilder::build(mesh);
         MeshGeometryProcessor::compute(mesh);
+        if (mesh.hasProperties()) MeshBoundaryPatchBuilder::buildCartesian(mesh);
         return mesh;
     } catch (const std::exception& error) {
         throw std::runtime_error("Cannot read VTU file '" + filename + "': " + error.what());
     }
+}
+
+Mesh VTKReader::read(const std::string& filename, MeshType type,
+                     unsigned dimension, const std::vector<double>& domain)
+{
+    Mesh properties(type, dimension, domain);
+    properties.requireCartesian3D();
+    auto mesh = read(filename);
+    if (mesh.hasProperties()) {
+        if (mesh.getType() != type || mesh.getDimension() != dimension || mesh.getDomain() != domain)
+            throw std::runtime_error("VTKReader: supplied mesh properties disagree with " + filename);
+    } else {
+        mesh.setProperties(type, dimension, domain);
+        MeshBoundaryPatchBuilder::buildCartesian(mesh);
+    }
+    return mesh;
 }
 
 }

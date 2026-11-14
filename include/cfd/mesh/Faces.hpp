@@ -44,7 +44,6 @@ namespace cfd {
             Nodes_.push_back(nodes);
             Owners_.push_back(owner);
             Neighbors_.push_back(neighbor);
-            BoundaryPatchIds_.push_back(patchId);
             CentersX_.push_back(0);
             CentersY_.push_back(0);
             CentersZ_.push_back(0);
@@ -52,6 +51,7 @@ namespace cfd {
             AreasX_.push_back(0);
             AreasY_.push_back(0);
             AreasZ_.push_back(0);
+            BoundaryPatchIds_.push_back(patchId);
         }
 
         // ===================================================================================== //

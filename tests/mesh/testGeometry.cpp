@@ -17,9 +17,9 @@ void testGeometry(
     const std::size_t nCells = mesh.cells.getNumber();
     const std::size_t nFaces = mesh.faces.getNumber();
 
-    const double dx = config.Lx / config.Nx;
-    const double dy = config.Ly / config.Ny;
-    const double dz = config.Lz / config.Nz;
+    const double dx = config.domain[0] / config.Nx;
+    const double dy = config.domain[1] / config.Ny;
+    const double dz = config.domain[2] / config.Nz;
 
     const double expectedVolume = dx * dy * dz;
     double totalVolume = 0.0;
@@ -55,7 +55,7 @@ void testGeometry(
     }
 
     require(approx(totalVolume,
-                   config.Lx * config.Ly * config.Lz),
+                   config.domain[0] * config.domain[1] * config.domain[2]),
             "Geometry: incorrect total domain volume");
 
     // 2. Check face geometry
@@ -71,7 +71,7 @@ void testGeometry(
 
         // Bounding box of the four face vertices
         std::array<double, 3> minP = {
-            config.Lx, config.Ly, config.Lz
+            config.domain[0], config.domain[1], config.domain[2]
         };
 
         std::array<double, 3> maxP = {

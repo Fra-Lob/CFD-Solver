@@ -3,6 +3,7 @@
 namespace cfd {
 
     void MeshGeometryProcessor::computeFaces(Mesh& mesh) {
+        if (mesh.hasProperties()) mesh.requireCartesian3D();
         size_t nFaces = mesh.faces.getNumber();
         for (std::size_t faceId = 0; faceId < nFaces; ++faceId) {
             auto nodes = mesh.faces.getNodes(faceId);
@@ -37,6 +38,7 @@ namespace cfd {
     }
 
     void MeshGeometryProcessor::computeCells(Mesh& mesh) {
+        if (mesh.hasProperties()) mesh.requireCartesian3D();
         size_t nCells = mesh.cells.getNumber();
         for (std::size_t cellId = 0; cellId < nCells; ++cellId) {
             auto nodes = mesh.cells.getNodes(cellId);

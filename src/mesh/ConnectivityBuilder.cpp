@@ -1,10 +1,9 @@
 #include <cfd/mesh/ConnectivityBuilder.hpp>
-#include <map>
-#include <algorithm>
 
 namespace cfd {
 
     void MeshConnectivityBuilder::build(Mesh& mesh) {
+        if (mesh.hasProperties()) mesh.requireCartesian3D();
         std::map<std::array<std::size_t, 4>, std::size_t> faceMap; // Map to store unique facesnding cell IDs
         for (std::size_t cellId = 0; cellId < mesh.cells.getNumber(); ++cellId) {
             std::array<std::size_t, 8> cellNodes = mesh.cells.getNodes(cellId);
