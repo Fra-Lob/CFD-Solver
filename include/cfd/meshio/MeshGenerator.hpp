@@ -2,7 +2,6 @@
 #pragma once
 
 #include <cfd/mesh/Mesh.hpp>
-#include <cstddef>
 
 namespace cfd
 {

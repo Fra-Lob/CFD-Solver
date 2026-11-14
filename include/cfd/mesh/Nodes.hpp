@@ -1,7 +1,6 @@
 #pragma once // Avoid multiple inclusions of this header file
 #include <vector>
 #include <array>
-#include <cstddef>
 #include <stdexcept>
 
 namespace cfd {

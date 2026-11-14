@@ -6,6 +6,8 @@ project(CFD_solver
     LANGUAGES CXX
 )
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -14,6 +16,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(cfd_core
     src/utils/Math.cpp
     src/meshio/MeshGenerator.cpp
+    src/meshio/VTKWriter.cpp
+    src/meshio/VTKReader.cpp
     src/mesh/ConnectivityBuilder.cpp
     src/mesh/GeometryProcessor.cpp
 )
@@ -24,29 +28,38 @@ target_include_directories(cfd_core
         ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Main application
-add_executable(CFD_solver
+add_executable(Main.exe
     apps/main.cpp
 )
 
 # Link the core library to the main application
-target_link_libraries(CFD_solver
-    PRIVATE
-        cfd_core
+target_link_libraries(Main.exe PRIVATE cfd_core)
+
+# Grid generation
+add_executable(Grid.exe
+    apps/grid.cpp
 )
+
+# Link the core library to the main application
+target_link_libraries(Grid.exe PRIVATE cfd_core)
 
 # ============================================================================================== #
 # Enable testing
 enable_testing()
 
 # Mesh tests
-add_executable(testMesh
+add_executable(TestMesh.exe
     tests/mesh/testMesh.cpp
     tests/mesh/testGenerator.cpp
     tests/mesh/testConnectivity.cpp
     tests/mesh/testGeometry.cpp
 )
 
-target_link_libraries(testMesh PRIVATE cfd_core)
+target_link_libraries(TestMesh.exe PRIVATE cfd_core)
 
-add_test(NAME Mesh COMMAND testMesh)
+add_test(NAME Mesh COMMAND TestMesh.exe)
+
+add_executable(TestVTKIO.exe tests/mesh/testVTKIO.cpp)
+target_link_libraries(TestVTKIO.exe PRIVATE cfd_core)
+add_test(NAME VTKIO COMMAND TestVTKIO.exe)
 
