@@ -1,101 +1,85 @@
+# CFD solver and mesh preprocessor
 
-# CFD-HPC
+A C++20 finite-volume project with a standalone mesh preparation workflow.
+The existing structure-of-arrays `Mesh`, `Nodes`, `Faces` and `Cells` are shared
+by the internal generators, optional Gmsh importer and native solver loader.
 
-A modular Computational Fluid Dynamics framework developed
-in modern C++.
+## Build and test
 
-## Project goals
+Requirements: a C++20 compiler, CMake >= 3.20 and Ninja. Gmsh is optional.
 
-- Finite Volume Method on structured meshes
-- Scalar transport and incompressible Navier-Stokes
-- Shared- and distributed-memory parallelization
-- Integration with machine learning workflows
+From the project root, the shortcuts are:
 
-## Current status
+```sh
+make
+make debug
+clean
+```
 
-Initial development environment setup.
+`make` configures a **Release** Ninja build in `build-native` and compiles only
+the preprocessor and native mesh loader. Test targets are disabled.
+`make debug` configures a **Debug** build in `build-debug`, including all tests;
+test executables are placed in `build-debug/tests`, outside the repository root.
+Run the suite with `ctest --test-dir build-debug --output-on-failure`.
+`clean` removes this project's recognized `build`/`build-*` CMake build directories
+and known executables in the repository root, including legacy Windows/WSL names.
+Source files, case configurations and case mesh outputs are preserved.
+`make clean` is also supported.
 
-## Saving and loading meshes
+In VS Code, **open a new terminal** after loading the project: workspace terminal
+settings add the repository to PATH, making bare `make`/`clean` available on Windows.
+On Linux/macOS, GNU Make uses the provided Makefile; the first configuration makes
+the `clean` helper executable. Outside VS Code, use `./clean` on Unix, or
+`.\make.cmd` and `.\clean.cmd` in PowerShell, or add the repository to your PATH.
+Existing terminals can use the explicit paths immediately; no global shell
+profile is modified.
+
+The equivalent CMake commands remain available:
+
+```sh
+cmake -S . -B build-native -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+cmake --build build-native
+
+cmake -S . -B build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+cmake --build build-debug
+ctest --test-dir build-debug --output-on-failure
+```
+
+Application executables (`mesh_preprocessor` and `Main`) are written to the
+repository root. On Windows CMake adds the `.exe` suffix automatically.
+
+## Prepare a case
+
+```sh
+./mesh_preprocessor examples/cartesian
+./mesh_preprocessor examples/cylindrical
+./mesh_preprocessor examples/spherical
+```
+
+Each case contains `grid.info`. Processing generates `<name>.vtu` for ParaView
+and `<name>.mesh` with completed topology, geometry and named boundary patches.
+Invalid input does not replace valid existing outputs.
 
 ```cpp
-#include <cfd/meshio/MeshGenerator.hpp>
-#include <cfd/meshio/VTKWriter.hpp>
-#include <cfd/meshio/VTKReader.hpp>
-
-// Mesh preparation (first run).
-cfd::MeshConfig config{cfd::MeshType::Cartesian, 3, {2.0, 3.0, 4.0}, 10, 8, 6};
-auto generated = cfd::MeshGenerator::generate(config);
-cfd::VTKWriter::write(generated, "mesh.vtu");
-
-// Simulation setup (a later run).
-auto mesh = cfd::VTKReader::read("mesh.vtu");
-auto type = mesh.getType();
-auto dimension = mesh.getDimension(); // Physical dimension, not node/cell counts.
-const auto& domain = mesh.getDomain(); // {Lx, Ly, Lz} for Cartesian 3D.
+#include <cfd/meshio/MeshReader.hpp>
+auto mesh = cfd::MeshReader::read("examples/cartesian/box.mesh");
 ```
 
-The reader supports single-piece ASCII XML UnstructuredGrid files with
-eight-node hexahedra (VTK type 12), including files produced by the writer.
-It rebuilds faces, owners/neighbors, boundary detection, face areas and area
-vectors, face/cell centers and cell volumes using the existing mesh processors.
-Malformed input, binary/appended arrays, multiple pieces and other cell types
-produce exceptions. No external XML or VTK library is required.
+The native loader restores all stored data without running connectivity or
+geometry builders. It is independent of the mesh origin. The separate main
+application demonstrates this loading step; the CFD solver is still future work.
 
-Structured node/cell dimensions are recovered when the complete connectivity
-matches the generator's indexing convention, including sheared meshes.
-Otherwise these dimensions remain zero; access the mesh by node/cell IDs.
-Mesh properties are stored as three ASCII FieldData arrays on UnstructuredGrid:
-`cfd_mesh_type` (1 = Cartesian, 2 = Cylindrical, 3 = Spherical),
-`cfd_mesh_dimension`, and `cfd_mesh_domain` (one tuple with dimension components).
-The reader restores them and rebuilds Cartesian boundary patches automatically:
-0 = xmin, 1 = xmax, 2 = ymin, 3 = ymax, 4 = zmin, 5 = zmax.
-The boundary builder uses `mesh.getDomain()` and checks all vertices of each
-boundary face against the six domain planes; internal faces retain INVALID_ID.
-It can also be called after generation as
-`cfd::MeshBoundaryPatchBuilder::buildCartesian(mesh)` once connectivity is built.
-PointData, CellData and unrelated FieldData are ignored; solution fields and
-custom boundary patch labels are not imported.
+## Documentation
 
-Older/external files without these arrays still load with unspecified mesh
-properties (Unknown, dimension 0, empty domain) and INVALID_ID boundary patches.
-Supply the properties explicitly to reconstruct the patches:
+- [Configuration, architecture, geometry conventions and Gmsh setup](docs/preprocessor.md).
+- [Versioned binary native mesh format](docs/mesh-format.md).
+- [Cartesian example](examples/cartesian/grid.info).
+- [Cylindrical annular sector](examples/cylindrical/grid.info).
+- [Spherical shell sector](examples/spherical/grid.info).
+- [Custom Gmsh case](examples/custom/grid.info), requiring the optional SDK.
 
-```cpp
-auto mesh = cfd::VTKReader::read("old-mesh.vtu", cfd::MeshType::Cartesian,
-                                 3, {2.0, 3.0, 4.0});
-```
-
-## Mesh properties and supported domains
-
-`Mesh(type, dimension, domain)` and `mesh.setProperties(type, dimension, domain)`
-validate and set the complete descriptor. Domain parameters must be finite,
-positive and match dimension (1, 2 or 3). Angles are in radians.
-
-| Type | 1D domain | 2D domain | 3D domain |
-| --- | --- | --- | --- |
-| Cartesian | `{Lx}` | `{Lx, Ly}` | `{Lx, Ly, Lz}` |
-| Cylindrical | `{R}` | `{L, R}` | `{L, R, theta}` |
-| Spherical | `{R}` | `{R, theta}` | `{R, theta, phi}` |
-
-Cylindrical theta and spherical phi are at most 2*pi; spherical theta is at most pi.
-All coordinate intervals start at zero. Descriptors for cylindrical, spherical,
-1D and 2D meshes can be constructed now, but generation, geometry processing and
-boundary reconstruction currently support only Cartesian 3D. Unsupported
-descriptors produce explicit errors in those operations and in the VTU reader.
-Changing metadata does not move nodes or recompute geometry/patches; rebuild
-them when necessary. Cartesian boundary classification requires a box aligned
-with the coordinate axes, spanning `[0,Lx] x [0,Ly] x [0,Lz]`.
-
-## Requirements
-
-- C++20 compiler
-- CMake >= 3.20
-- Ninja
-
-## Build
-
-```bash
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-./build/cfd-hpc
-```
+All supported meshes use eight-node hexahedra and four-node faces. Curved
+sectors use a documented piecewise-planar metric representation. Singular axes,
+poles, periodic full turns, arbitrary polyhedra and non-hexahedral Gmsh volume
+elements are explicitly unsupported. Gmsh integration tests run only when the
+SDK is found; otherwise the unavailable-dependency behavior is tested.

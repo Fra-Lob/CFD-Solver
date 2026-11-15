@@ -1,0 +1,11 @@
+# Annular sector; angles in degrees.
+name = annulus
+type = cylindrical
+rInner = 1
+rOuter = 2
+length = 3
+thetaStart = -30
+thetaEnd = 90
+Nr = 3
+Ntheta = 16
+Nz = 4

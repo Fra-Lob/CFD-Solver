@@ -211,9 +211,11 @@ void readProperties(const Element& grid, Mesh& mesh)
     const auto t = values<std::size_t>(*type, 1)[0];
     const auto d = values<std::size_t>(*dimension, 1)[0];
     if (t < 1 || t > 3 || d < 1 || d > 3) fail("invalid mesh type or dimension");
-    checkArray(*domain, d, true);
-    mesh.setProperties(static_cast<MeshType>(t), static_cast<unsigned>(d), values<double>(*domain, d));
-    mesh.requireCartesian3D(); // Current reader/processors support this case only.
+    const auto components=integer(domain->attribute("NumberOfComponents"));
+    if(components<1 || components>6) fail("invalid domain parameter count");
+    checkArray(*domain, components, true);
+    mesh.setProperties(static_cast<MeshType>(t), static_cast<unsigned>(d), values<double>(*domain, components));
+    mesh.requireHex3D();
 }
 
 // VTU has no structured dimensions. Recover them only after checking the
@@ -285,7 +287,7 @@ Mesh VTKReader::read(const std::string& filename)
         recoverDimensions(mesh);
         MeshConnectivityBuilder::build(mesh);
         MeshGeometryProcessor::compute(mesh);
-        if (mesh.hasProperties()) MeshBoundaryPatchBuilder::buildCartesian(mesh);
+        if (mesh.hasProperties()) MeshBoundaryPatchBuilder::build(mesh);
         return mesh;
     } catch (const std::exception& error) {
         throw std::runtime_error("Cannot read VTU file '" + filename + "': " + error.what());
@@ -296,14 +298,14 @@ Mesh VTKReader::read(const std::string& filename, MeshType type,
                      unsigned dimension, const std::vector<double>& domain)
 {
     Mesh properties(type, dimension, domain);
-    properties.requireCartesian3D();
+    properties.requireHex3D();
     auto mesh = read(filename);
     if (mesh.hasProperties()) {
         if (mesh.getType() != type || mesh.getDimension() != dimension || mesh.getDomain() != domain)
             throw std::runtime_error("VTKReader: supplied mesh properties disagree with " + filename);
     } else {
         mesh.setProperties(type, dimension, domain);
-        MeshBoundaryPatchBuilder::buildCartesian(mesh);
+        MeshBoundaryPatchBuilder::build(mesh);
     }
     return mesh;
 }

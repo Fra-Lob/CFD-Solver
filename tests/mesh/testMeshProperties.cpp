@@ -47,6 +47,25 @@ int main()
         using cfd::MeshType;
         Mesh empty;
         test::require(!empty.hasProperties() && empty.getDimension() == 0 && empty.getDomain().empty(), "Default mesh");
+        // Preserve the useful container checks from the retired preliminary test.
+        test::require(empty.nodes.getNumber()==0 && empty.faces.getNumber()==0 && empty.cells.getNumber()==0,
+                      "Empty entity containers");
+        {
+            Mesh containers;
+            containers.nodes.addCoordinates(0.,0.,0.);
+            containers.nodes.addCoordinates(1.,2.,3.);
+            test::require(containers.nodes.getNumber()==2 &&
+                          containers.nodes.getCoordinates(1)==std::array<double,3>{1.,2.,3.}, "Node insertion");
+            rejects([&] { containers.nodes.getCoordinates(2); });
+            containers.faces.addByNodes({0,1,2,3},0,1);
+            containers.faces.addByNodes({4,5,6,7},1);
+            test::require(containers.faces.getNumber()==2 && containers.faces.getOwner(0)==0 &&
+                          containers.faces.getNeighbor(0)==1 && !containers.faces.isBoundary(0) &&
+                          containers.faces.getNodes(1)==std::array<std::size_t,4>{4,5,6,7} &&
+                          containers.faces.getOwner(1)==1 && containers.faces.isBoundary(1) &&
+                          containers.faces.getNeighbor(1)==cfd::constants::INVALID_ID, "Face insertion and adjacency");
+            rejects([&] { containers.faces.getNodes(2); });
+        }
         for (auto type : {MeshType::Cartesian, MeshType::Cylindrical, MeshType::Spherical}) {
             for (unsigned d = 1; d <= 3; ++d) {
                 std::vector<double> domain(d, 1.0);

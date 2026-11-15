@@ -12,13 +12,20 @@ compile_commands.json
 *.a
 *.so
 *.exe
+/Main
+/mesh_preprocessor
 
 # Mesh
 *.vtu
 
 # VS Code local settings
-.vscode/
+.vscode/*
+!.vscode/settings.json
 
 # Python cache
 __pycache__/
 *.pyc
+
+# Preprocessor outputs in the sample cases
+/examples/*/*.vtu
+/examples/*/*.mesh

@@ -1,8 +1,14 @@
 
-#include <cfd/meshio/VTKReader.hpp>
+#include <cfd/meshio/MeshReader.hpp>
+#include <iostream>
 
-int main()
+int main(int argc,char** argv)
 {
-    auto mesh = cfd::VTKReader::read("mesh.vtu");
-    
+    if(argc!=2) { std::cerr<<"Usage: Main <completed.mesh>\n"; return 1; }
+    try {
+        std::cout<<"Reading completed native mesh: "<<argv[1]<<std::endl;
+        const auto mesh=cfd::MeshReader::read(argv[1]);
+        std::cout<<"Loaded "<<mesh.getName()<<": "<<mesh.cells.getNumber()<<" cells; stored topology and geometry ready\n";
+        return 0;
+    } catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
 }

@@ -1,22 +1,19 @@
 #include <cfd/mesh/ConnectivityBuilder.hpp>
+#include "HexGeometry.hpp"
 
 namespace cfd {
 
     void MeshConnectivityBuilder::build(Mesh& mesh) {
-        if (mesh.hasProperties()) mesh.requireCartesian3D();
+        mesh.requireHex3D();
+        if (mesh.faces.getNumber()!=0) throw std::logic_error("Connectivity is already built");
         std::map<std::array<std::size_t, 4>, std::size_t> faceMap; // Map to store unique facesnding cell IDs
         for (std::size_t cellId = 0; cellId < mesh.cells.getNumber(); ++cellId) {
             std::array<std::size_t, 8> cellNodes = mesh.cells.getNodes(cellId);
 
             // Define the faces of the hexahedral cell
-            std::array<std::array<std::size_t, 4>, 6> cellFaces = {{
-                {cellNodes[0], cellNodes[3], cellNodes[2], cellNodes[1]}, // Bottom face
-                {cellNodes[4], cellNodes[5], cellNodes[6], cellNodes[7]}, // Top face
-                {cellNodes[0], cellNodes[1], cellNodes[5], cellNodes[4]}, // Front face
-                {cellNodes[3], cellNodes[7], cellNodes[6], cellNodes[2]}, // Back face
-                {cellNodes[0], cellNodes[4], cellNodes[7], cellNodes[3]}, // Left face
-                {cellNodes[1], cellNodes[2], cellNodes[6], cellNodes[5]}  // Right face
-            }};
+            std::array<std::array<std::size_t,4>,6> cellFaces;
+            for(unsigned f=0;f<6;++f) for(unsigned n=0;n<4;++n)
+                cellFaces[f][n]=cellNodes[detail::localFaces[f][n]];
             
             int localFaceId = 0;
             for (const auto& faceNodes : cellFaces) {

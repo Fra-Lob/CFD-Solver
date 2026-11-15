@@ -1,0 +1,12 @@
+# Polar angle measured from +Z; azimuth from +X towards +Y.
+name = shell
+type = spherical
+rInner = 1
+rOuter = 2
+polarStart = 30
+polarEnd = 120
+azimuthStart = 10
+azimuthEnd = 100
+Nr = 3
+Ntheta = 12
+Nphi = 12

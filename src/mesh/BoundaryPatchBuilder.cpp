@@ -4,6 +4,43 @@
 
 namespace cfd {
 
+    void MeshBoundaryPatchBuilder::build(Mesh& mesh) {
+        if(mesh.getType()==MeshType::Cartesian) buildCartesian(mesh);
+        else if(mesh.getType()==MeshType::Cylindrical || mesh.getType()==MeshType::Spherical) buildLogical(mesh);
+        else throw std::invalid_argument("Custom patches must come from physical surface groups");
+    }
+
+    void MeshBoundaryPatchBuilder::buildLogical(Mesh& mesh) {
+        mesh.requireHex3D();
+        if(mesh.getType()!=MeshType::Cylindrical && mesh.getType()!=MeshType::Spherical)
+            throw std::invalid_argument("Logical patch classification requires a generated sector");
+        if((mesh.getType()==MeshType::Cylindrical && mesh.getDomain().size()!=5) ||
+           (mesh.getType()==MeshType::Spherical && mesh.getDomain().size()!=6))
+            throw std::invalid_argument("Logical sector patches require the full sector domain descriptor");
+        const std::array<std::size_t,3> size={mesh.nodes.getNx(),mesh.nodes.getNy(),mesh.nodes.getNz()};
+        for(auto n:size) if(n<2) throw std::invalid_argument("Missing logical node dimensions");
+        const auto names=mesh.getType()==MeshType::Cylindrical ?
+            std::array<std::string,6>{"inner","outer","angular_start","angular_end","axial_start","axial_end"} :
+            std::array<std::string,6>{"inner","outer","polar_start","polar_end","azimuth_start","azimuth_end"};
+        std::map<std::size_t,std::string> metadata;
+        for(unsigned p=0;p<6;++p) metadata.emplace(p,names[p]);
+        std::vector<std::size_t> patches(mesh.faces.getNumber(),constants::INVALID_ID);
+        for(std::size_t f=0;f<mesh.faces.getNumber();++f) if(mesh.faces.isBoundary(f)) {
+            for(unsigned axis=0;axis<3;++axis) for(unsigned side=0;side<2;++side) {
+                const auto nodes=mesh.faces.getNodes(f);
+                if(std::all_of(nodes.begin(),nodes.end(),[&](auto n){
+                    return mesh.nodes.getIndicesFromId(n)[axis]==(side==0 ? 0 : size[axis]-1);
+                })) {
+                    if(patches[f]!=constants::INVALID_ID) throw std::runtime_error("Ambiguous logical patch at face "+std::to_string(f));
+                    patches[f]=2*axis+side;
+                }
+            }
+            if(patches[f]==constants::INVALID_ID) throw std::runtime_error("Missing logical patch at face "+std::to_string(f));
+        }
+        for(std::size_t f=0;f<patches.size();++f) mesh.faces.setBoundaryPatchId(f,patches[f]);
+        mesh.setPatchNames(metadata);
+    }
+
     void MeshBoundaryPatchBuilder::buildCartesian(Mesh& mesh) {
         mesh.requireCartesian3D();
         const auto& domain = mesh.getDomain();
@@ -34,5 +71,6 @@ namespace cfd {
         // Commit only after every boundary face has been classified successfully.
         for (std::size_t faceId = 0; faceId < nFaces; ++faceId)
             mesh.faces.setBoundaryPatchId(faceId, patches[faceId]);
+        mesh.setPatchNames({{0,"xmin"},{1,"xmax"},{2,"ymin"},{3,"ymax"},{4,"zmin"},{5,"zmax"}});
     }
 }

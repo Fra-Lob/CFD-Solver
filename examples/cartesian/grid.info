@@ -1,0 +1,9 @@
+# Lengths in metres; Nx, Ny, Nz are cell counts.
+name = box
+type = cartesian
+Lx = 2
+Ly = 1
+Lz = 1
+Nx = 10
+Ny = 5
+Nz = 5
