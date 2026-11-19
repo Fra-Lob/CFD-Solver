@@ -1,4 +1,4 @@
-# Native mesh format, version 1
+# Native mesh format, version 2
 
 The native file restores a completed `cfd::Mesh`. It does not contain C++ object
 memory, padding, vector layouts or implementation-specific serialized objects.
@@ -17,13 +17,12 @@ are limited to 1 MiB by this implementation. Entity IDs are implicit record indi
 | Field | Encoding |
 | --- | --- |
 | Magic | 8 bytes: `43 46 44 4d 45 53 48 00` (`CFDMESH\0`) |
-| Version | u32, value 1 |
-| Metric convention | u32, value 1 (canonical triangulated faces) |
+| Version | u32, value 2 |
+| Metric convention | u32, value 2 (analytic generated curves; canonical planar/custom faces) |
 | Origin/type | u32: 0 unknown, 1 Cartesian, 2 cylindrical, 3 spherical, 4 custom |
-| Physical dimension | u32 (3 for the preprocessor; 0 only for unspecified legacy metadata) |
 | Mesh name | string |
-| Domain parameter count | u64 |
-| Domain parameters | that many f64 values; schema in [preprocessor documentation](preprocessor.md) |
+| Domain | Exactly six f64 endpoint values; schema in [preprocessor documentation](preprocessor.md) |
+| Resolution | Exactly three u64 values; zero for unstructured/unspecified metadata |
 | Patch count | u64 |
 | Patch metadata | for each patch, ascending ID: u64 patch ID, string name |
 | Logical node dimensions | three u64: Nx, Ny, Nz (all zero when unspecified) |
@@ -76,6 +75,11 @@ and scalar areas are not recalculated or replaced.
 auto mesh = cfd::MeshReader::read("case/name.mesh");
 ```
 
-The current version stores chordal/triangulated geometry only. Exact curved FVM
-metrics, other topologies or additional solver fields would require an explicit
-future convention/version rather than silently changing the meaning of these fields.
+The mesh type selects the metric interpretation. Cylindrical and spherical meshes
+store exact curved areas, oriented surface integrals, volumes and centroids.
+Cartesian/custom/unspecified meshes store the canonical triangulated metrics.
+The resolution is distinct from the three logical node counts; a periodic axis
+has as many nodes as cells rather than one extra endpoint node.
+
+Version 1 is rejected explicitly: regenerate existing case outputs with the
+preprocessor. No dimension field or variable-length domain is stored in version 2.

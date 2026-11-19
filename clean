@@ -1,3 +1,4 @@
 #!/bin/sh
+# Unix entry point for the plain clean command; this is a script, not a binary.
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
 exec cmake -DCFD_ACTION=clean -P "$project_dir/CMakeLists.txt"

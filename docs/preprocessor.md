@@ -5,6 +5,12 @@ the standalone `mesh_preprocessor` executable. The future solver uses
 `cfd::MeshReader::read(path)` and receives the same `Mesh` for every origin.
 Public `nodes`, `faces` and `cells` remain structure-of-arrays containers.
 
+The application code lives under `source/apps`, public headers under
+`source/include/cfd` and implementations under `source/src`. Regression suites
+remain under the top-level `tests` directory. The root `.clang-format` records
+the shared C++ formatting conventions. CMake sections and C++ section headers
+separate configuration, metadata, topology, geometry, I/O and validation phases.
+
 ## Build and run
 
 From the repository root:
@@ -41,100 +47,103 @@ installation. Messages are flushed immediately so the last active phase remains
 visible on failure. Library callers stay quiet by default; pass an optional
 `std::ostream*` to `Preprocessor::run` to receive the same progress messages.
 
-## grid.info
+## grid.info and domain description
 
-See the complete sample cases under [examples](../examples/). Blank lines and
-`#` or `;` comments, including inline comments, are supported. Fields are
-case-sensitive and can appear in any order. Duplicate, unknown and missing
-fields, trailing numeric text, nonfinite values and unsafe file names fail.
-Lengths use metres, user-facing angles use **degrees**, and resolutions count
-three-dimensional cells even when a resolution equals one.
+A generated mesh is described by exactly four properties: name, type, domain,
+and resolution. There is no independent dimension field or alternate domain schema.
+Only volume hexahedra are implemented. Under the current resolution convention,
+each generated axis must have more than one cell; other resolutions are rejected.
 
-Every file requires `name` and `type`. A name is a plain file stem using letters,
-digits, dots, underscores or hyphens, excluding `.` and `..`.
+The domain is always `std::array<double, 6>`:
+`{Dim1In, Dim1Out, Dim2In, Dim2Out, Dim3In, Dim3Out}`.
+Resolution is `std::array<std::size_t, 3>`, in the corresponding coordinate order.
+The type determines the physical meaning of the intervals:
 
-| type | Geometry fields | Resolution fields |
+| Type | Six domain values, in storage order | Resolution |
 | --- | --- | --- |
-| cartesian | Lx, Ly, Lz | Nx, Ny, Nz |
-| cylindrical | rInner, rOuter, length, thetaStart, thetaEnd | Nr, Ntheta, Nz |
-| spherical | rInner, rOuter, polarStart, polarEnd, azimuthStart, azimuthEnd | Nr, Ntheta, Nphi |
-| custom | none; reads `<name>.msh` in the case directory | none |
+| Cartesian | xMin, xMax, yMin, yMax, zMin, zMax | Nx, Ny, Nz |
+| Cylindrical | rInner, rOuter, thetaStart, thetaEnd, zMin, zMax | Nr, Ntheta, Nz |
+| Spherical | rInner, rOuter, polarStart, polarEnd, azimuthStart, azimuthEnd | Nr, Ntheta, Nphi |
+| Custom | Six reserved zero values; explicit imported nodes define the geometry | Three zeros: unstructured indexing |
 
-Cartesian coordinates span `[0,Lx] x [0,Ly] x [0,Lz]`.
-Cylindrical sectors map `x=r*cos(theta)`, `y=r*sin(theta)`, `z=axial`.
-Spherical sectors use polar angle theta from +Z and azimuth phi from +X towards
-+Y: `x=r*sin(theta)*cos(phi)`, `y=r*sin(theta)*sin(phi)`, `z=r*cos(theta)`.
-All internal angles and metadata bounds are radians.
+The input uses those type-specific keys, plus `name` and `type`. Custom input
+only needs name/type and reads `<name>.msh`. See [the examples](../examples/).
+Lengths are metres; input angles are degrees, converted to radians internally.
+Cartesian domains can be translated and can contain negative coordinates.
+Every interval must increase. The old Lx/Ly/Lz and cylindrical length keys are
+replaced by explicit endpoints, without a second compatibility schema.
 
-For sectors, `0 < rInner < rOuter` and ordered angular bounds are mandatory.
-Cylindrical length is positive. Total cylindrical angle and spherical azimuth
-extent are strictly below 360 degrees; each angular chord cell must span less
-than 180 degrees. Spherical polar bounds are strictly between 0 and 180 degrees.
-The axis, origin, poles and periodic full-turn topology are explicitly unsupported.
-Invalid, inverted, degenerate and numerically uncertifiable cells fail validation.
+Blank lines and `#`/`;` comments are supported, including inline comments. Keys
+are case sensitive. Duplicate, missing, unknown or invalid fields fail. Names
+are plain file stems containing letters, digits, dots, underscores or hyphens.
 
-## Internal interfaces and metadata
+```cpp
+cfd::MeshConfig config{
+    cfd::MeshType::Cylindrical,
+    {1.0, 2.0, 0.0, std::numbers::pi / 2, -1.0, 3.0},
+    {4, 12, 6},
+    "annulus"
+};
+auto mesh = cfd::MeshGenerator::generate(config);
+```
 
-`MeshGenerator::generate(MeshConfig)` dispatches to dedicated Cartesian,
-cylindrical and spherical coordinate functions. A common logical grid helper
-preserves the eight-node VTK hex order. Topology is built once using the existing
-connectivity builder. Geometry is completed once, boundary patches assigned, then
-the common validator runs. Gmsh imports arrive completed and are not rebuilt by
-the preprocessor. The native writer validates before serializing, and the native
-reader validates restored data without running builders or modifying metrics.
+[Mesh](../source/include/cfd/mesh/Mesh.hpp) provides a constructor and atomic
+`setProperties(type, domain, resolution)`, plus getters for all four properties
+and `setName`. Changing metadata does not regenerate existing entities.
+A default mesh has unspecified properties for external files without metadata.
+Patch names map IDs to labels; individual face IDs remain in `Faces`.
 
-`Mesh` retains `getType()`, `getDimension()`, `getDomain()`, constructor and
-`setProperties()`. It also has `getName()/setName()` and
-`getPatchNames()/setPatchNames()`. Patch metadata maps an ID to a name; per-face
-IDs remain stored only in `Faces`. Origin is Cartesian, Cylindrical, Spherical
-or Custom, independently of physical boundary conditions.
+## Coordinates, topology and boundaries
 
-Generated sector metadata uses the following arrays:
+A single structured grid loop uses the type to map coordinates:
 
-* Cartesian: `{Lx,Ly,Lz}`.
-* Cylindrical: `{rInner,rOuter,length,thetaStart,thetaEnd}`.
-* Spherical: `{rInner,rOuter,polarStart,polarEnd,azimuthStart,azimuthEnd}`.
-* Custom: an empty array, dimension 3; no Cartesian bounds are inferred.
+* Cartesian: `(x,y,z)`.
+* Cylindrical: `(r*cos(theta), r*sin(theta), z)`.
+* Spherical: `(r*sin(polar)*cos(azimuth), r*sin(polar)*sin(azimuth), r*cos(polar))`.
 
-The earlier short 1D/2D/3D descriptor constructors remain available, but generation
-requires full 3D sector descriptors. Physical dimensional reduction is not implemented.
-Unspecified legacy VTU metadata is still allowed; it does not imply a Cartesian box.
+Cells retain eight corner nodes and six faces. The same connectivity builder
+creates owners/neighbours for all types. Partial angular intervals use ordinary
+boundary faces. A complete 360-degree cylindrical angle or spherical azimuth
+wraps connectivity and shares the seam nodes and faces; the seam is internal.
+There are no overlapping artificial boundary walls. Full turns require at least
+three angular cells; each angular cell must span less than 180 degrees.
 
-Logical counts in `Nodes` and `Cells` are independent of physical dimension.
-Their axes are `(x,y,z)`, `(r,theta,z)` or `(r,polar,azimuth)` respectively.
-Patch IDs 0..5 follow the min/max of these logical axes. Cartesian names are
-xmin/xmax/ymin/ymax/zmin/zmax; sector names are listed by the CLI. Custom meshes
-preserve physical surface tags and names from Gmsh instead.
+Patch IDs follow the lower/upper side of each coordinate, 0 through 5.
+Cartesian names are xmin/xmax/ymin/ymax/zmin/zmax; cylindrical names are
+inner/outer/angular_start/angular_end/axial_start/axial_end; spherical names are
+inner/outer/polar_start/polar_end/azimuth_start/azimuth_end. A full turn omits
+the two periodic direction patches. Imported custom patches use Gmsh physical tags.
 
-## Discrete geometry convention
+Radial coordinates currently require `0 < rInner < rOuter`. Spherical polar
+bounds must lie strictly between 0 and 180 degrees. Axes, origins and poles need
+different cell topologies and are not implemented. Angular extents above a full
+turn are rejected.
 
-The metrics describe the **piecewise planar mesh**, not an exact curved solid.
-Every global quadrilateral has a fixed diagonal: cyclically rotate its nodes so
-the lowest global node ID is first, then use triangles `(0,1,2)` and `(0,2,3)`.
-Both incident cells therefore use exactly the same surface. The scalar face area
-is the sum of triangle areas; its vector is the sum of oriented triangle area
-vectors, and its center is the scalar-area-weighted triangle centroid.
-On a warped face, scalar area can exceed the magnitude of the area vector.
+## Geometry used by the solver
 
-Cell volume and volumetric centroid use signed tetrahedral integration over that
-closed triangulated boundary, with a local reference to reduce cancellation.
-No absolute-volume correction hides an inverted cell. This gives analytical
-triangle/tetrahedron metrics for the discrete solid and exact Cartesian box
-metrics. For a cylindrical annulus the total chordal volume is
-`0.5*(ro^2-ri^2)*length*Ntheta*sin(deltaTheta)`, approaching the curved volume
-under angular refinement. Spherical metrics similarly converge to the analytical
-shell-sector volume `(ro^3-ri^3)/3*(cos(theta0)-cos(theta1))*(phi1-phi0)`.
-No exact curved areas are mixed into these chordal volumes or normals.
+Generated cylindrical and spherical meshes use exact integrals of their curved
+coordinate surfaces, not chordal polyhedra:
 
-The validator checks topology, distinct nodes and faces, reciprocal incidences,
-positive finite metrics, outward face/triangle orientation, patch completeness
-and per-cell area-vector closure. Trilinear hex Jacobian positivity is certified
-over the reference cube using tensor-quadratic Bernstein bounds and adaptive
-subdivision (at most six bisections per axis). Near singular or unresolved cases
-are rejected conservatively. The selected triangulated cells must also be
-star-shaped with respect to the integration reference and stored volume centroid.
-Highly warped valid finite elements outside this supported representation can
-therefore be rejected; arbitrary polyhedra are not supported.
+* Cylindrical cell volume: `(ro^2-ri^2)/2 * (theta1-theta0) * (z1-z0)`.
+* Spherical cell volume: `(ro^3-ri^3)/3 * (cos(polar0)-cos(polar1)) * (azimuth1-azimuth0)`.
+
+Cell centers are volume centroids; face centers are surface-area centroids.
+Scalar face area integrates `dA`. The oriented area vector integrates `n dA`
+and points outward from the owner. Its magnitude can be smaller than the scalar
+area on curved faces. Shared faces use the same metrics for both incident cells,
+and oriented area vectors close for each cell. Annular cells need not be convex:
+centroid-to-face and straight triangle tests do not define their curved normals.
+
+The validator checks generated curved node coordinates/connectivity against the
+domain/resolution, verifies analytic metrics and checks topology, patch coverage
+and vector-area closure. It does not modify a loaded mesh.
+
+Cartesian, external unspecified and Custom meshes use the existing generic
+polyhedral calculation. Each face is rotated to start at its lowest node ID and
+triangulated along a shared canonical diagonal. Areas and centers are integrated
+over those triangles; signed tetrahedra give volumes and volume centroids.
+Trilinear Jacobians and triangle orientation are checked conservatively.
+Unsupported, inverted, degenerate or numerically uncertifiable cells fail.
 
 ## Gmsh dependency
 
@@ -163,29 +172,42 @@ Triangle metrics and signed cell integration are computed by the common processo
 the importer does not assume the API provides complete FVM face metrics.
 The importer owns a serial Gmsh session and refuses to run inside an existing one.
 
-## Outputs and safety
+## Outputs
 
-`<name>.vtu` uses standard ASCII VTK XML UnstructuredGrid and type-12 hexahedra.
-Its geometry is suitable for ParaView. Optional `cfd_mesh_*` FieldData records
-generated-domain properties for the existing VTU reader; these fields are not
-the solver's authoritative storage. Custom VTU output does not encode physical
-patch data; use the native file for solver setup.
+`<name>.vtu` is ASCII VTK XML. Cartesian/custom output uses linear hexahedra
+(type 12). Generated cylindrical/spherical output uses quadratic rational Bezier
+hexahedra (type 79), with 27 control points per cell and `RationalWeights` in
+PointData. Adjacent cells share controls. Rational angular weights represent
+circular arcs exactly, including spherical surfaces. Control points are export
+geometry, not extra solver nodes; the number of cells is unchanged.
 
-`<name>.mesh` preserves all completed data; see [the native format](mesh-format.md).
+In ParaView, increase **Nonlinear Subdivision Level** on the representation
+(e.g. 3 or 4) to render the curved surfaces smoothly. Rendering still tessellates
+surfaces into pixels/triangles; the file contains the rational curved geometry.
+See [VTK's rational Bezier implementation report](https://www.kitware.com/main/wp-content/uploads/2020/03/Implementation-of-rational-Be%CC%81zier-cells-into-VTK-Report.pdf).
 
-Validation precedes export. Both files are staged in a uniquely created directory
-inside the case directory. Existing files are backed up before the completed pair
-is installed, and ordinary I/O failures roll back both outputs. Restoration
-failures leave backups and report their location. This is not a crash-atomic
-two-file transaction and does not coordinate concurrent runs on the same case.
-Output directories or symlinks are refused instead of being replaced.
+`cfd_mesh_type`, `cfd_mesh_name`, `cfd_mesh_domain` (six components), and
+`cfd_mesh_resolution` (three components) FieldData restore generated metadata.
+The name is stored as numeric UTF-8 bytes to avoid XML escaping ambiguities.
+The reader accepts external linear hexes and this generated Bezier layout,
+validates its controls/weights/topology, and restores the original solver mesh.
+It does not support arbitrary external Bezier/NURBS meshes. Custom VTU output
+does not carry physical patch metadata; native storage preserves it.
+
+`<name>.mesh` stores completed mesh entities and all metadata, using
+[native format version 2](mesh-format.md). Existing version-1 outputs must be
+regenerated with the preprocessor. The native loader restores the stored metrics
+and connectivity directly. Analytic validation checks their consistency without
+rebuilding or replacing them.
+
+Both outputs are staged before replacing existing files, with backups and rollback
+for ordinary I/O failures. This is not a crash-atomic two-file transaction. Case
+source files and directories/symlinks are not overwritten as output files.
 
 ## Tests
 
-CTest keeps the Cartesian, geometry, property and VTU regression tests, and adds
-configuration, curved generation/validation, full native round-trip, complete case
-pipeline and optional Gmsh groups. Native round trips compare every stored entity
-attribute and metadata, then verify byte-for-byte reserialization. Corruption,
-truncation, invalid inputs and protection of existing outputs are covered.
-The Gmsh group tests the API fixture and unsupported tetrahedra only when linked;
-otherwise it explicitly reports that only the unavailable-dependency path ran.
+Run `make debug` followed by `ctest --test-dir build-debug --output-on-failure`.
+The suites cover configuration errors, fixed metadata, translated Cartesian
+bounds, analytical curved metrics, periodic seam connectivity, VTU round trips,
+native byte-exact round trips and corrupt input. The Gmsh API cases run only
+when its optional SDK is linked; otherwise the missing-dependency path is tested.

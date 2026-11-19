@@ -1,88 +1,56 @@
-# Implementation and verification report
+# Verification of the domain and curved-geometry update
 
-## Architecture changes
-
-* Added `GridConfigReader` for strict case-directory configuration, and a common
-  dispatch to Cartesian, cylindrical and spherical generation functions.
-* Extended mesh metadata with a name, Custom origin and named patch IDs, while
-  preserving the public SoA containers and existing entity accessors.
-* Reused connectivity building for all origins. Added logical sector boundary
-  classification; Gmsh boundaries use physical surface groups instead.
-* Replaced absolute tetrahedron volume accumulation with consistent signed
-  integration over shared canonical face triangles; added Jacobian certification
-  and common completed-mesh validation.
-* Added versioned, little-endian native serialization with full attributes and
-  an FNV-1a checksum. Loading never invokes connectivity or geometry builders.
-* Added optional Gmsh API integration with a clear no-SDK fallback.
-* Added a standalone preprocessor with staged output replacement and rollback;
-  the separate main application demonstrates native solver loading.
-
-Principal additions are under `include/cfd/meshio` and `src/meshio`:
-`GridConfigReader`, `GmshImporter`, `MeshReader`, `MeshWriter`, `NativeMeshIO` and
-`Preprocessor`; plus `MeshValidator`, the internal `HexGeometry` helpers,
-`apps/preprocessor.cpp`, the case fixtures, native/geometry documentation and
-`tests/mesh/testPreprocessor.cpp`. Existing Mesh, generator, geometry,
-connectivity, boundary builder, VTU I/O, CMake and README were adapted.
-Legacy Cartesian tests were retained.
-
-The checked-out branch was `main` (despite the attachment describing it as a
-feature branch). No checkout, commit or branch modification was performed;
-`initial_version` was not modified.
-
-## Commands actually executed
-
-The commands below record the initial architecture verification. Current build
-shortcuts are `make` (Release, no tests) and `make debug` (Debug with tests), with
-CTest run as `ctest --test-dir build-debug --output-on-failure`. Explicit CMake
-test configurations now require `-DBUILD_TESTING=ON`.
+## Commands executed
 
 ```sh
-cmake -S . -B build-preprocessor-check -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-preprocessor-check
-ctest --test-dir build-preprocessor-check --output-on-failure
+cmake -S . -B build-check -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+cmake --build build-check --parallel 6
+ctest --test-dir build-check --output-on-failure
 ```
 
-Clean configuration and build succeeded with GNU C++ 13.2.0 on Windows.
-All **8 CTest groups passed**:
+GNU C++ 13.2.0 on Windows: configuration and compilation succeeded.
+All eight CTest groups passed:
 
-| Group | Result |
+| Group | Checks |
 | --- | --- |
-| Mesh | PASS: existing Cartesian generator/connectivity/geometry regression |
-| VTKIO | PASS: existing ASCII VTU round trips and malformed inputs |
-| MeshProperties | PASS: metadata and Cartesian boundary regression |
-| Preprocessor_config | PASS: parser, required/unknown/duplicate fields, conversions, missing files |
-| Preprocessor_generated | PASS: Cartesian/cylindrical/spherical counts, geometry, patches, analytic comparisons and invalid cells |
-| Preprocessor_native | PASS: exact comparison of all attributes, byte-exact reserialization, checksum/truncation errors, VTU round trip and warped Custom hex |
-| Preprocessor_pipeline | PASS: all three internal case workflows, replacement of valid output pairs, protection against invalid input |
-| Preprocessor_gmsh | PASS: explicit unavailable-SDK diagnostic; enabled API tests were not run |
+| Mesh | Cartesian generation, node/cell numbering, connectivity, geometry, closure |
+| VTKIO | Translated Cartesian and rational Bezier round trips, name/resolution metadata, full-turn cylinder/sphere, malformed XML and arrays |
+| MeshProperties | Fixed six endpoints, resolution validation, atomic setters, translated boundary planes |
+| Preprocessor_config | Type-specific endpoint keys, strict parsing, degrees-to-radians conversion, invalid fields/counts |
+| Preprocessor_generated | Exact cylindrical/spherical volumes, cylindrical surface areas and volume centroid, periodic seam topology, spherical outer area, invalid geometry |
+| Preprocessor_native | Exact metadata/entities, byte-identical reserialization, checksum/truncation errors, VTU reload, warped Custom mesh |
+| Preprocessor_pipeline | All internal examples, repeated output replacement, invalid-input protection |
+| Preprocessor_gmsh | Clear unavailable-SDK diagnostic; enabled Gmsh API branch not tested |
 
-The CLI was run separately on the supplied internal cases:
+The VTU test independently evaluates exported rational Bernstein sums at
+parameters between control points. It checks the physical radius on inner/outer
+surfaces and inside cells for cylindrical and spherical geometry, including
+full turns. A straight chord representation would fail this test.
 
-| Case | Nodes | Cells | Faces | Validation and native reload |
-| --- | ---: | ---: | ---: | --- |
-| Cartesian box | 396 | 250 | 875 | PASS |
-| Cylindrical annulus | 340 | 192 | 700 | PASS |
-| Spherical shell sector | 676 | 432 | 1512 | PASS |
+## Example workflows
 
-All three generated VTU files were also parsed with the independent .NET XML
-parser in PowerShell; point/connectivity/type lengths and every cell offset
-were checked successfully. Native files were loaded using the separate main
-application and the native round-trip tests compare all stored fields exactly.
-The custom CLI was run and correctly returned failure with the no-Gmsh message.
+The preprocessor was run on all three internal example directories and regenerated
+both ASCII VTU and native version-2 files:
 
-## Limits of this verification
+| Case | Solver nodes | Cells | Faces | Physical patches |
+| --- | ---: | ---: | ---: | ---: |
+| Cartesian box | 396 | 250 | 875 | 6 |
+| Full cylindrical annulus | 320 | 192 | 688 | 4 |
+| Spherical shell interval | 676 | 432 | 1512 | 6 |
 
-No Gmsh SDK was found by CMake. The enabled C++ API integration and conditional
-hex/tetrahedron import tests therefore remain **unverified in this environment**.
-A representative tagged hex MSH fixture and unsupported tetrahedron fixture are
-included for a build with the SDK. The no-SDK behavior was tested explicitly.
+VTU control points are additional export data, so curved VTU point counts exceed
+solver node counts. Cell counts are preserved. The cylindrical example retains
+a 360-degree extent and now uses 16 angular cells in place of the invalid count 1.
 
-No ParaView, pvpython or usable VTK Python installation was found. Direct
-ParaView/VTK-tooling compatibility was not tested; XML validation and the
-project's VTU reader succeeded. No exact curved FVM metrics, singular or periodic
-topology, reduced-dimensional solver, or nonhex volume elements are claimed.
-Output safety was tested for repeated valid processing and invalid input;
-power-loss recovery and injected filesystem failures were not tested.
+## Verification limits
 
-See [the workflow and geometry conventions](preprocessor.md) and
-[the native format specification](mesh-format.md) for the supported scope.
+ParaView and VTK Python are not installed. Actual rendering in ParaView has not
+been tested here; the implementation follows VTK's rational Bezier cell format,
+and XML structure, round trips and rational radius evaluation were verified.
+Increase Nonlinear Subdivision Level in ParaView to see smooth surface rendering.
+
+No Gmsh SDK was found. The enabled API import branch remains unverified in this
+environment; its explicit unavailable-dependency path passed.
+
+Axes/origins, spherical poles and non-hexahedral volume cells remain unsupported.
+See [the workflow](preprocessor.md) and [native format version 2](mesh-format.md).

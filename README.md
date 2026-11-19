@@ -4,6 +4,24 @@ A C++20 finite-volume project with a standalone mesh preparation workflow.
 The existing structure-of-arrays `Mesh`, `Nodes`, `Faces` and `Cells` are shared
 by the internal generators, optional Gmsh importer and native solver loader.
 
+## Project layout and code style
+
+```text
+source/
+    apps/       Application entry points
+    include/    Public cfd headers
+    src/        Implementations and private helpers
+tests/          Regression suites and fixtures
+examples/       Input cases
+docs/           Workflow and native format documentation
+```
+
+All C++ files follow the root `.clang-format` configuration: four-space
+indentation, explicit control-flow blocks, one operation per line and separated
+function definitions. Section headers follow the existing entity containers.
+The more involved parsing, geometry and serialization code also uses descriptive
+names and comments identifying its main phases.
+
 ## Build and test
 
 Requirements: a C++20 compiler, CMake >= 3.20 and Ninja. Gmsh is optional.
@@ -33,6 +51,13 @@ the `clean` helper executable. Outside VS Code, use `./clean` on Unix, or
 `.\make.cmd` and `.\clean.cmd` in PowerShell, or add the repository to your PATH.
 Existing terminals can use the explicit paths immediately; no global shell
 profile is modified.
+
+There is one build configuration: `CMakeLists.txt`. The small Makefile contains
+only command aliases to CMake, not a second source list or set of compiler flags.
+The extensionless `clean` file is a Unix shell script, not a compiled executable;
+`clean.cmd` serves Windows, where that shell script cannot run directly.
+Both delegate to the same CMake cleanup action. These platform entry points are
+kept so the existing short commands continue to work without changing shell profiles.
 
 The equivalent CMake commands remain available:
 
@@ -74,12 +99,15 @@ application demonstrates this loading step; the CFD solver is still future work.
 - [Configuration, architecture, geometry conventions and Gmsh setup](docs/preprocessor.md).
 - [Versioned binary native mesh format](docs/mesh-format.md).
 - [Cartesian example](examples/cartesian/grid.info).
-- [Cylindrical annular sector](examples/cylindrical/grid.info).
+- [Cylindrical annulus](examples/cylindrical/grid.info).
 - [Spherical shell sector](examples/spherical/grid.info).
 - [Custom Gmsh case](examples/custom/grid.info), requiring the optional SDK.
 
-All supported meshes use eight-node hexahedra and four-node faces. Curved
-sectors use a documented piecewise-planar metric representation. Singular axes,
-poles, periodic full turns, arbitrary polyhedra and non-hexahedral Gmsh volume
-elements are explicitly unsupported. Gmsh integration tests run only when the
-SDK is found; otherwise the unavailable-dependency behavior is tested.
+All solver cells have eight corner nodes and six faces. Generated cylindrical
+and spherical meshes use analytic curved metrics and rational Bezier VTU cells
+for curved visualization. Their domain is always six ordered endpoints, with a
+separate three-value resolution and no dimension field. Full angular turns share
+seam connectivity. Axes, origins, spherical poles and non-hexahedral Gmsh volumes
+remain unsupported. See [configuration and geometry](docs/preprocessor.md).
+
+Previously generated native outputs use an older format and must be regenerated.
