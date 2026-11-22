@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cfd/utils/Math.hpp>
-#include <cfd/mesh/Nodes.hpp>
-#include <cfd/mesh/Faces.hpp>
-#include <cfd/mesh/Cells.hpp>
+#include <utils/Math.hpp>
+#include <mesh/Nodes.hpp>
+#include <mesh/Faces.hpp>
+#include <mesh/Cells.hpp>
 
 class Mesh {
     std::array<double, 3> domain{};

@@ -1,6 +1,6 @@
 #include "TestUtils.hpp"
 
-#include <cfd/fields/ScalarField.hpp>
+#include <fields/ScalarField.hpp>
 
 namespace test {
     

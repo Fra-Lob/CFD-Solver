@@ -1,4 +1,4 @@
-#include <cfd/mesh/MeshBuilder.hpp>
+#include <mesh/MeshBuilder.hpp>
 
 #include <algorithm>
 #include <cmath>

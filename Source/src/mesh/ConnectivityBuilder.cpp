@@ -1,4 +1,4 @@
-#include <cfd/mesh/MeshBuilder.hpp>
+#include <mesh/MeshBuilder.hpp>
 
 void MeshBuilder::computeConnectivity(Mesh& mesh) {
     std::map<std::array<std::size_t, 4>, std::size_t> faceMap; // Map to store unique faces for each cell IDs

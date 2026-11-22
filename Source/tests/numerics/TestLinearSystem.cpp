@@ -1,6 +1,6 @@
 #include "TestUtils.hpp"
 
-#include <cfd/numerics/LinearSystem.hpp>
+#include <numerics/LinearSystem.hpp>
 
 namespace test {
 

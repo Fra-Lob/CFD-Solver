@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cfd/mesh/Mesh.hpp>
+#include <mesh/Mesh.hpp>
 
 #include <string>
 

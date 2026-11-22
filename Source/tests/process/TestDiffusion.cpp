@@ -1,10 +1,10 @@
 #include "TestUtils.hpp"
 
-#include <cfd/mesh/MeshBuilder.hpp>
-#include <cfd/meshio/MeshGenerator.hpp>
-#include <cfd/numerics/LinearSystem.hpp>
-#include <cfd/physics/BoundaryConditions.hpp>
-#include <cfd/process/Diffusion.hpp>
+#include <mesh/MeshBuilder.hpp>
+#include <meshio/MeshGenerator.hpp>
+#include <numerics/LinearSystem.hpp>
+#include <physics/BoundaryConditions.hpp>
+#include <process/Diffusion.hpp>
 
 #include <eigen3/Eigen/IterativeLinearSolvers>
 #include <eigen3/Eigen/Sparse>

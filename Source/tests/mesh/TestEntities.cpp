@@ -1,4 +1,4 @@
-#include <cfd/mesh/Mesh.hpp>
+#include <mesh/Mesh.hpp>
 
 namespace test {
 namespace {

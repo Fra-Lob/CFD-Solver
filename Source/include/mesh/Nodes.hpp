@@ -1,4 +1,5 @@
-#pragma once // Avoid multiple inclusions of this header file
+#pragma once 
+
 #include <vector>
 #include <array>
 #include <stdexcept>

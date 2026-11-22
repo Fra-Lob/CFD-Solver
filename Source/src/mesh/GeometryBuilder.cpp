@@ -1,4 +1,4 @@
-#include <cfd/mesh/MeshBuilder.hpp>
+#include <mesh/MeshBuilder.hpp>
 
 void MeshBuilder::computeFacesGeometry(Mesh& mesh) {
     size_t nFaces = mesh.faces.getNumber();

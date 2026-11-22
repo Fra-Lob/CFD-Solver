@@ -1,6 +1,6 @@
 #include "TestUtils.hpp"
-#include <cfd/mesh/MeshBuilder.hpp>
-#include <cfd/meshio/MeshGenerator.hpp>
+#include <mesh/MeshBuilder.hpp>
+#include <meshio/MeshGenerator.hpp>
 
 #include "TestConnectivity.cpp"
 #include "TestEntities.cpp"

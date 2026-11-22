@@ -1,8 +1,8 @@
 
 #include "TestUtils.hpp"
 
-#include <cfd/mesh/Mesh.hpp>
-#include <cfd/meshio/MeshGenerator.hpp>
+#include <mesh/Mesh.hpp>
+#include <meshio/MeshGenerator.hpp>
 
 #include <array>
 #include <cstddef>

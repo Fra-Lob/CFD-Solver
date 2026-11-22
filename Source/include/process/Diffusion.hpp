@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cfd/mesh/Mesh.hpp>
-#include <cfd/numerics/LinearSystem.hpp>
-#include <cfd/physics/BoundaryConditions.hpp> 
+#include <mesh/Mesh.hpp>
+#include <numerics/LinearSystem.hpp>
+#include <physics/BoundaryConditions.hpp> 
 
 class Diffusion {
 public:

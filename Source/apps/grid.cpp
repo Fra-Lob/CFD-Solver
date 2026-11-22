@@ -1,8 +1,8 @@
 
-#include <cfd/meshio/MeshGenerator.hpp>
-#include <cfd/meshio/MeshConverter.hpp>
-#include <cfd/meshio/VTKConverter.hpp>
-#include <cfd/mesh/MeshBuilder.hpp>
+#include <meshio/MeshGenerator.hpp>
+#include <meshio/MeshConverter.hpp>
+#include <meshio/VTKConverter.hpp>
+#include <mesh/MeshBuilder.hpp>
 
 #include <iostream>
 

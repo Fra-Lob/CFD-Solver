@@ -1,5 +1,5 @@
 #include "TestUtils.hpp"
-#include <cfd/meshio/MeshGenerator.hpp>
+#include <meshio/MeshGenerator.hpp>
 
 #include "TestGenerator.cpp"
 #include "TestMeshConverter.cpp"

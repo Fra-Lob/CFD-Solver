@@ -1,5 +1,5 @@
-#include "cfd/physics/BoundaryConditions.hpp"
-#include <cfd/process/Diffusion.hpp>
+#include <physics/BoundaryConditions.hpp>
+#include <process/Diffusion.hpp>
 #include <cstddef>
 
 void Diffusion::assemble(const Mesh& mesh,
