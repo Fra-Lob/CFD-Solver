@@ -1,4 +1,4 @@
-#include <meshio/VTKConverter.hpp>
+#include <io/VTKConverter.hpp>
 
 #include <cmath>
 #include <fstream>
@@ -7,6 +7,7 @@
 #include <locale>
 #include <set>
 #include <stdexcept>
+#include <utility>
 
 namespace {
 
@@ -156,6 +157,14 @@ void writeCellData(
 
 void VTKConverter::write(
     const Mesh& mesh,
+    const std::string& filename
+)
+{
+    write(mesh, filename, std::vector<CellScalarData>{});
+}
+
+void VTKConverter::write(
+    const Mesh& mesh,
     const std::string& filename,
     const std::vector<CellScalarData>& cellScalars
 )
@@ -186,4 +195,29 @@ void VTKConverter::write(
     if (!file) {
         throw std::runtime_error("VTKConverter: failed writing file: " + filename);
     }
+}
+
+void VTKConverter::write(
+    const Mesh& mesh,
+    const std::string& filename,
+    const SimulationConfig& config
+)
+{
+    std::vector<CellScalarData> cellScalars;
+    cellScalars.reserve(config.scalarFields.size());
+    for (const auto& field : config.scalarFields) {
+        if (field.getNumber() != mesh.cells.getNumber()) {
+            throw std::invalid_argument(
+                "VTKConverter: scalar field '" + field.getName() +
+                "' has a cell count that differs from the mesh"
+            );
+        }
+        std::vector<double> values;
+        values.reserve(field.getNumber());
+        for (std::size_t cell = 0; cell < field.getNumber(); ++cell) {
+            values.push_back(field.getValue(cell));
+        }
+        cellScalars.push_back({field.getName(), std::move(values)});
+    }
+    write(mesh, filename, cellScalars);
 }

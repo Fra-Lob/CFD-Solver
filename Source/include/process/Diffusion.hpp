@@ -3,6 +3,7 @@
 #include <mesh/Mesh.hpp>
 #include <numerics/LinearSystem.hpp>
 #include <physics/BoundaryConditions.hpp> 
+#include <utils/Math.hpp>
 
 class Diffusion {
 public:

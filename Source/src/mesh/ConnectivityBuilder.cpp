@@ -1,5 +1,10 @@
 #include <mesh/MeshBuilder.hpp>
 
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <map>
+
 void MeshBuilder::computeConnectivity(Mesh& mesh) {
     std::map<std::array<std::size_t, 4>, std::size_t> faceMap; // Map to store unique faces for each cell IDs
     for (std::size_t cellId = 0; cellId < mesh.cells.getNumber(); ++cellId) {

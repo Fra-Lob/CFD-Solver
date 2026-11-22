@@ -1,6 +1,8 @@
 #include <meshio/MeshGenerator.hpp>
-#include <stdexcept>
+
+#include <array>
 #include <cmath>
+#include <stdexcept>
 
 Mesh MeshGenerator::generate(const MeshConfig& config) {
 

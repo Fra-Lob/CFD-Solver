@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <cstddef>
 #include <stdexcept>
    
 class Nodes {

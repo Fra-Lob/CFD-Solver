@@ -1,7 +1,6 @@
 
 #include "TestUtils.hpp"
 
-#include <mesh/Mesh.hpp>
 #include <mesh/MeshBuilder.hpp>
 #include <meshio/MeshGenerator.hpp>
 

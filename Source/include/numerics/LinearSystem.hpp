@@ -1,8 +1,8 @@
 #pragma once
 
 #include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/IterativeLinearSolvers>
-#include <eigen3/Eigen/src/Core/Matrix.h>
+
+#include <cstddef>
 #include <vector>
 
 class LinearSystem {

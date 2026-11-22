@@ -3,7 +3,6 @@
 #include <mesh/MeshBuilder.hpp>
 #include <meshio/MeshGenerator.hpp>
 #include <numerics/LinearSystem.hpp>
-#include <physics/BoundaryConditions.hpp>
 #include <process/Diffusion.hpp>
 
 #include <eigen3/Eigen/IterativeLinearSolvers>

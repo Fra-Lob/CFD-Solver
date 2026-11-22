@@ -1,5 +1,9 @@
 #include <mesh/MeshBuilder.hpp>
 
+#include <array>
+#include <cmath>
+#include <cstddef>
+
 void MeshBuilder::computeFacesGeometry(Mesh& mesh) {
     size_t nFaces = mesh.faces.getNumber();
     for (std::size_t faceId = 0; faceId < nFaces; ++faceId) {

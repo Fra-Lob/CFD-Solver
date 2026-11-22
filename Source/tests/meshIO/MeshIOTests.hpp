@@ -3,6 +3,7 @@
 
 #include "TestGenerator.cpp"
 #include "TestMeshConverter.cpp"
+#include "TestCaseReader.cpp"
 
 #include <exception>
 #include <iostream>
@@ -23,6 +24,9 @@ int main() {
         reporter.subgroup("Mesh converter");
         reporter.run("mesh file write/read round trip including empty meshes",
                      test::testMeshConverter);
+        reporter.subgroup("Case reader");
+        reporter.run("key-value parsing, scalar fields and boundary conditions",
+                     test::testCaseReader);
         reporter.passed();
         return 0;
     } catch (const std::exception& error) {

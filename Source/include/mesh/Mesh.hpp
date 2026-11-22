@@ -1,9 +1,10 @@
 #pragma once
 
-#include <utils/Math.hpp>
 #include <mesh/Nodes.hpp>
 #include <mesh/Faces.hpp>
 #include <mesh/Cells.hpp>
+
+#include <array>
 
 class Mesh {
     std::array<double, 3> domain{};

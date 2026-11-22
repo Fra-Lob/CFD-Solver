@@ -10,8 +10,8 @@ enum class BoundaryType {
 
 struct BoundaryCondition {
 public:
-    BoundaryType type;
-    double value;
+    BoundaryType type = BoundaryType::Neumann;
+    double value = 0.0;
 };
 
 class BoundaryConditions {

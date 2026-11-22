@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mesh/Mesh.hpp>
+#include <io/SimulationConfig.hpp>
 
 #include <string>
 #include <vector>
@@ -14,8 +15,17 @@ class VTKConverter {
 public:
     static void write(
         const Mesh& mesh,
+        const std::string& filename
+    );
+    static void write(
+        const Mesh& mesh,
         const std::string& filename,
-        const std::vector<CellScalarData>& cellScalars = {}
+        const std::vector<CellScalarData>& cellScalars
+    );
+    static void write(
+        const Mesh& mesh,
+        const std::string& filename,
+        const SimulationConfig& config
     );
 
     static Mesh read(const std::string& filename);

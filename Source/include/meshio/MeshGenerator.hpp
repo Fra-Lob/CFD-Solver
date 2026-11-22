@@ -3,6 +3,8 @@
 
 #include <mesh/Mesh.hpp>
 
+#include <cstddef>
+
 struct MeshConfig
 {
     double lx, ly, lz;

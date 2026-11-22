@@ -1,6 +1,6 @@
 #include <utils/Math.hpp>
+
 #include <cmath>
-#include <array>
 
 namespace math {
 

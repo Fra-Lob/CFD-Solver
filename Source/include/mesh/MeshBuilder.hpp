@@ -1,10 +1,9 @@
 #pragma once
 
 #include <mesh/Mesh.hpp>
+#include <utils/Math.hpp>
 
-#include <algorithm>
 #include <cstddef>
-#include <map>
 
 enum class CartesianPatch : std::size_t {
     XMin = 0,

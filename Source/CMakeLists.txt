@@ -38,11 +38,13 @@ add_library(cfd_core
     src/utils/Math.cpp
     src/meshio/MeshGenerator.cpp
     src/meshio/MeshConverter.cpp
-    src/meshio/VTKConverter.cpp
+    src/io/VTKConverter.cpp
+    src/io/CaseReader.cpp
     src/mesh/ConnectivityBuilder.cpp
     src/mesh/GeometryBuilder.cpp
     src/mesh/BoundaryPatchBuilder.cpp
     src/process/Diffusion.cpp
+    src/process/Runner.cpp
 )
 
 target_include_directories(cfd_core

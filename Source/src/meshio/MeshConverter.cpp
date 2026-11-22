@@ -2,6 +2,7 @@
 
 #include <mesh/MeshBuilder.hpp>
 
+#include <array>
 #include <charconv>
 #include <cmath>
 #include <fstream>
@@ -10,7 +11,6 @@
 #include <locale>
 #include <sstream>
 #include <stdexcept>
-#include <string>
 
 namespace {
 

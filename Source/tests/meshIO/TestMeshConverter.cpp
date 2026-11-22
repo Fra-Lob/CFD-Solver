@@ -5,7 +5,6 @@
 #include <meshio/MeshGenerator.hpp>
 
 #include <filesystem>
-#include <iostream>
 #include <stdexcept>
 
 namespace {

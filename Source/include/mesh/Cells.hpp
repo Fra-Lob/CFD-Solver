@@ -1,9 +1,11 @@
 #pragma once // Avoid multiple inclusions of this header file
 #include <utils/Constants.hpp>
-#include <vector>
+
 #include <array>
-#include <stdexcept>
 #include <cmath>
+#include <cstddef>
+#include <stdexcept>
+#include <vector>
   
 class Cells {
 
