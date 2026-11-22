@@ -5,8 +5,6 @@
 #include <cfd/mesh/Faces.hpp>
 #include <cfd/mesh/Cells.hpp>
 
-namespace cfd {
-
 class Mesh {
     std::array<double, 3> domain{};
 
@@ -30,5 +28,3 @@ public:
     }
 
 };
-
-}

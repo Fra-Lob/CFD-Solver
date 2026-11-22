@@ -7,16 +7,16 @@
 #include <exception>
 #include <iostream>
 
-int main()
-{
+int main() {
+
     test::SuiteReporter reporter("MESHIO TESTS");
     try {
         reporter.subgroup("Mesh generator");
         reporter.run("structured node coordinates, numbering and cell connectivity", [] {
-            for (const cfd::MeshConfig config : {
-                     cfd::MeshConfig{1.0, 1.0, 1.0, 1, 1, 1},
-                     cfd::MeshConfig{2.0, 3.0, 4.0, 4, 3, 2}}) {
-                const auto mesh = cfd::MeshGenerator::generate(config);
+            for (const MeshConfig config : {
+                     MeshConfig{1.0, 1.0, 1.0, 1, 1, 1},
+                     MeshConfig{2.0, 3.0, 4.0, 4, 3, 2}}) {
+                const auto mesh = MeshGenerator::generate(config);
                 test::testGenerator(mesh, config);
             }
         });

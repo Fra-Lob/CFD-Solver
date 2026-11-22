@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-namespace cfd {
-
 class ScalarField {
 private:
     std::string name_;
@@ -50,4 +48,3 @@ public:
     std::fill(values_.begin(), values_.end(), value);
     }
 };
-}

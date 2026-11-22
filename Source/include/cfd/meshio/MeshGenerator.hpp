@@ -3,9 +3,6 @@
 
 #include <cfd/mesh/Mesh.hpp>
 
-namespace cfd
-{
-
 struct MeshConfig
 {
     double lx, ly, lz;
@@ -17,5 +14,3 @@ class MeshGenerator
 public:
     static Mesh generate(const MeshConfig& config);
 };
-
-} // namespace cfd

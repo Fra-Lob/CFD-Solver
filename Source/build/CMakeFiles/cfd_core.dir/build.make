@@ -170,6 +170,20 @@ CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lobre/CFD_solver/Source/src/mesh/BoundaryPatchBuilder.cpp -o CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.s
 
+CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o: CMakeFiles/cfd_core.dir/flags.make
+CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o: /home/lobre/CFD_solver/Source/src/process/Diffusion.cpp
+CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o: CMakeFiles/cfd_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lobre/CFD_solver/Source/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o -MF CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o.d -o CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o -c /home/lobre/CFD_solver/Source/src/process/Diffusion.cpp
+
+CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lobre/CFD_solver/Source/src/process/Diffusion.cpp > CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.i
+
+CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lobre/CFD_solver/Source/src/process/Diffusion.cpp -o CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.s
+
 # Object files for target cfd_core
 cfd_core_OBJECTS = \
 "CMakeFiles/cfd_core.dir/src/utils/Math.cpp.o" \
@@ -178,7 +192,8 @@ cfd_core_OBJECTS = \
 "CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o" \
 "CMakeFiles/cfd_core.dir/src/mesh/ConnectivityBuilder.cpp.o" \
 "CMakeFiles/cfd_core.dir/src/mesh/GeometryBuilder.cpp.o" \
-"CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.o"
+"CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.o" \
+"CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o"
 
 # External object files for target cfd_core
 cfd_core_EXTERNAL_OBJECTS =
@@ -190,9 +205,10 @@ libcfd_core.a: CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o
 libcfd_core.a: CMakeFiles/cfd_core.dir/src/mesh/ConnectivityBuilder.cpp.o
 libcfd_core.a: CMakeFiles/cfd_core.dir/src/mesh/GeometryBuilder.cpp.o
 libcfd_core.a: CMakeFiles/cfd_core.dir/src/mesh/BoundaryPatchBuilder.cpp.o
+libcfd_core.a: CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o
 libcfd_core.a: CMakeFiles/cfd_core.dir/build.make
 libcfd_core.a: CMakeFiles/cfd_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lobre/CFD_solver/Source/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library libcfd_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lobre/CFD_solver/Source/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX static library libcfd_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/cfd_core.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/cfd_core.dir/link.txt --verbose=$(VERBOSE)
 

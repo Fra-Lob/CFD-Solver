@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-namespace cfd {
-
 struct CellScalarData {
     std::string name;
     std::vector<double> values;
@@ -22,5 +20,3 @@ public:
 
     static Mesh read(const std::string& filename);
 };
-
-}

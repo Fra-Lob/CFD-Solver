@@ -3,8 +3,8 @@
 #include <exception>
 #include <iostream>
 
-int main()
-{
+int main() {
+    
     test::SuiteReporter reporter("NUMERICS TESTS");
     try {
         reporter.subgroup("Linear system");

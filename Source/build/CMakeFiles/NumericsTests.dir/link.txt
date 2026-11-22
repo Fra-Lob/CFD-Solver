@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/NumericsTests.dir/link.d CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.o -o /home/lobre/CFD_solver/Tests/NumericsTests.exe  libcfd_core.a

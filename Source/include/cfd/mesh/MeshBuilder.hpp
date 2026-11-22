@@ -6,8 +6,6 @@
 #include <cstddef>
 #include <map>
 
-namespace cfd {
-
 enum class CartesianPatch : std::size_t {
     XMin = 0,
     XMax = 1,
@@ -32,5 +30,3 @@ public:
 
     static void computeBoundaryPatch(Mesh& mesh);
 };
-
-}

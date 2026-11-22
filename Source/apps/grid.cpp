@@ -9,21 +9,21 @@
 int main()
 {
     // Mesh configuration
-    cfd::MeshConfig config{
+    MeshConfig config{
         2.0, 1.0, 1.0,
         10, 5, 5
     };
 
     // Generate mesh
-    auto mesh = cfd::MeshGenerator::generate(config);
+    auto mesh = MeshGenerator::generate(config);
 
     // Build connectivity
-    cfd::MeshBuilder::computeConnectivity(mesh);
-    cfd::MeshBuilder::computeFullGeometry(mesh);
-    cfd::MeshBuilder::computeBoundaryPatch(mesh);
+    MeshBuilder::computeConnectivity(mesh);
+    MeshBuilder::computeFullGeometry(mesh);
+    MeshBuilder::computeBoundaryPatch(mesh);
 
-    cfd::MeshConverter::write(mesh, "mesh.mesh");
-    cfd::VTKConverter::write(mesh, "mesh.vtu");
+    MeshConverter::write(mesh, "mesh.mesh");
+    VTKConverter::write(mesh, "mesh.vtu");
 
     std::cout << "Mesh exported successfully to mesh.mesh and mesh.vtu\n";
 

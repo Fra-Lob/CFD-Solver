@@ -2,7 +2,7 @@
 #include <cmath>
 #include <array>
 
-namespace cfd::math {
+namespace math {
 
     Vector3 opposite(const Vector3& a) {
         return{-a[0], -a[1], -a[2]};

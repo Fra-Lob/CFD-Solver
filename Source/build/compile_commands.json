@@ -43,6 +43,12 @@
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o -c /home/lobre/CFD_solver/Source/src/process/Diffusion.cpp",
+  "file": "/home/lobre/CFD_solver/Source/src/process/Diffusion.cpp",
+  "output": "CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o"
+},
+{
+  "directory": "/home/lobre/CFD_solver/Source/build",
   "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/Main.exe.dir/apps/main.cpp.o -c /home/lobre/CFD_solver/Source/apps/main.cpp",
   "file": "/home/lobre/CFD_solver/Source/apps/main.cpp",
   "output": "CMakeFiles/Main.exe.dir/apps/main.cpp.o"
@@ -55,32 +61,32 @@
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
-  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/TestMesh.exe.dir/tests/mesh/testMesh.cpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/testMesh.cpp",
-  "file": "/home/lobre/CFD_solver/Source/tests/mesh/testMesh.cpp",
-  "output": "CMakeFiles/TestMesh.exe.dir/tests/mesh/testMesh.cpp.o"
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/tests -I/home/lobre/CFD_solver/Source/include -x c++ -std=c++20 -o CMakeFiles/MeshTests.dir/tests/mesh/MeshTests.hpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/MeshTests.hpp",
+  "file": "/home/lobre/CFD_solver/Source/tests/mesh/MeshTests.hpp",
+  "output": "CMakeFiles/MeshTests.dir/tests/mesh/MeshTests.hpp.o"
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
-  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/TestMesh.exe.dir/tests/mesh/testGenerator.cpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/testGenerator.cpp",
-  "file": "/home/lobre/CFD_solver/Source/tests/mesh/testGenerator.cpp",
-  "output": "CMakeFiles/TestMesh.exe.dir/tests/mesh/testGenerator.cpp.o"
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/tests -I/home/lobre/CFD_solver/Source/include -x c++ -std=c++20 -o CMakeFiles/MeshIOTests.dir/tests/meshIO/MeshIOTests.hpp.o -c /home/lobre/CFD_solver/Source/tests/meshIO/MeshIOTests.hpp",
+  "file": "/home/lobre/CFD_solver/Source/tests/meshIO/MeshIOTests.hpp",
+  "output": "CMakeFiles/MeshIOTests.dir/tests/meshIO/MeshIOTests.hpp.o"
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
-  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/TestMesh.exe.dir/tests/mesh/testConnectivity.cpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/testConnectivity.cpp",
-  "file": "/home/lobre/CFD_solver/Source/tests/mesh/testConnectivity.cpp",
-  "output": "CMakeFiles/TestMesh.exe.dir/tests/mesh/testConnectivity.cpp.o"
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/tests -I/home/lobre/CFD_solver/Source/include -x c++ -std=c++20 -o CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.o -c /home/lobre/CFD_solver/Source/tests/numerics/NumericsTests.hpp",
+  "file": "/home/lobre/CFD_solver/Source/tests/numerics/NumericsTests.hpp",
+  "output": "CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.o"
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
-  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/TestMesh.exe.dir/tests/mesh/testGeometry.cpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/testGeometry.cpp",
-  "file": "/home/lobre/CFD_solver/Source/tests/mesh/testGeometry.cpp",
-  "output": "CMakeFiles/TestMesh.exe.dir/tests/mesh/testGeometry.cpp.o"
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/tests -I/home/lobre/CFD_solver/Source/include -x c++ -std=c++20 -o CMakeFiles/FieldsTests.dir/tests/fields/FieldsTests.hpp.o -c /home/lobre/CFD_solver/Source/tests/fields/FieldsTests.hpp",
+  "file": "/home/lobre/CFD_solver/Source/tests/fields/FieldsTests.hpp",
+  "output": "CMakeFiles/FieldsTests.dir/tests/fields/FieldsTests.hpp.o"
 },
 {
   "directory": "/home/lobre/CFD_solver/Source/build",
-  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/include -std=c++20 -o CMakeFiles/TestMeshConverter.exe.dir/tests/mesh/testMeshConverter.cpp.o -c /home/lobre/CFD_solver/Source/tests/mesh/testMeshConverter.cpp",
-  "file": "/home/lobre/CFD_solver/Source/tests/mesh/testMeshConverter.cpp",
-  "output": "CMakeFiles/TestMeshConverter.exe.dir/tests/mesh/testMeshConverter.cpp.o"
+  "command": "/usr/bin/c++  -I/home/lobre/CFD_solver/Source/tests -I/home/lobre/CFD_solver/Source/include -x c++ -std=c++20 -o CMakeFiles/ProcessTests.dir/tests/process/ProcessTests.hpp.o -c /home/lobre/CFD_solver/Source/tests/process/ProcessTests.hpp",
+  "file": "/home/lobre/CFD_solver/Source/tests/process/ProcessTests.hpp",
+  "output": "CMakeFiles/ProcessTests.dir/tests/process/ProcessTests.hpp.o"
 }
 ]

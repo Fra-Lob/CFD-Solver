@@ -12,7 +12,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace cfd {
 namespace {
 
 [[noreturn]] void fail(const std::string& filename, const std::string& message)
@@ -190,6 +189,4 @@ Mesh MeshConverter::read(const std::string& filename)
         if (mesh.faces.isBoundary(face)) mesh.faces.setBoundaryPatchId(face, patches[face]);
     }
     return mesh;
-}
-
 }

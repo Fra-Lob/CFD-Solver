@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/cfd_core.dir/src/meshio/MeshGenerator.cpp.o.d"
   "CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o"
   "CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o.d"
+  "CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o"
+  "CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o.d"
   "CMakeFiles/cfd_core.dir/src/utils/Math.cpp.o"
   "CMakeFiles/cfd_core.dir/src/utils/Math.cpp.o.d"
   "libcfd_core.a"

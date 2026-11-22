@@ -1,8 +1,11 @@
 /home/lobre/CFD_solver/Source/build/CMakeFiles/cfd_core.dir
 /home/lobre/CFD_solver/Source/build/CMakeFiles/Main.exe.dir
 /home/lobre/CFD_solver/Source/build/CMakeFiles/Grid.exe.dir
-/home/lobre/CFD_solver/Source/build/CMakeFiles/TestMesh.exe.dir
-/home/lobre/CFD_solver/Source/build/CMakeFiles/TestMeshConverter.exe.dir
+/home/lobre/CFD_solver/Source/build/CMakeFiles/MeshTests.dir
+/home/lobre/CFD_solver/Source/build/CMakeFiles/MeshIOTests.dir
+/home/lobre/CFD_solver/Source/build/CMakeFiles/NumericsTests.dir
+/home/lobre/CFD_solver/Source/build/CMakeFiles/FieldsTests.dir
+/home/lobre/CFD_solver/Source/build/CMakeFiles/ProcessTests.dir
 /home/lobre/CFD_solver/Source/build/CMakeFiles/test.dir
 /home/lobre/CFD_solver/Source/build/CMakeFiles/edit_cache.dir
 /home/lobre/CFD_solver/Source/build/CMakeFiles/rebuild_cache.dir

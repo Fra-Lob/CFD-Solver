@@ -17,27 +17,27 @@ int main()
         test::testEntities(reporter);
 
         const std::array configs = {
-            cfd::MeshConfig{1.0, 1.0, 1.0, 1, 1, 1},
-            cfd::MeshConfig{2.0, 3.0, 4.0, 2, 1, 1},
-            cfd::MeshConfig{2.0, 3.0, 4.0, 2, 2, 2},
-            cfd::MeshConfig{2.0, 3.0, 4.0, 4, 3, 2},
-            cfd::MeshConfig{2.0, 3.0, 4.0, 10, 8, 6}
+            MeshConfig{1.0, 1.0, 1.0, 1, 1, 1},
+            MeshConfig{2.0, 3.0, 4.0, 2, 1, 1},
+            MeshConfig{2.0, 3.0, 4.0, 2, 2, 2},
+            MeshConfig{2.0, 3.0, 4.0, 4, 3, 2},
+            MeshConfig{2.0, 3.0, 4.0, 10, 8, 6}
         };
         reporter.subgroup("Connectivity");
         reporter.run("face and cell adjacency on representative grids", [&] {
             for (const auto& config : configs) {
-                auto mesh = cfd::MeshGenerator::generate(config);
-                cfd::MeshBuilder::computeConnectivity(mesh);
+                auto mesh = MeshGenerator::generate(config);
+                MeshBuilder::computeConnectivity(mesh);
                 test::testConnectivity(mesh, config);
             }
         });
         reporter.subgroup("Geometry");
         reporter.run("face and cell geometry and boundary patches on representative grids", [&] {
             for (const auto& config : configs) {
-                auto mesh = cfd::MeshGenerator::generate(config);
-                cfd::MeshBuilder::computeConnectivity(mesh);
-                cfd::MeshBuilder::computeFullGeometry(mesh);
-                cfd::MeshBuilder::computeBoundaryPatch(mesh);
+                auto mesh = MeshGenerator::generate(config);
+                MeshBuilder::computeConnectivity(mesh);
+                MeshBuilder::computeFullGeometry(mesh);
+                MeshBuilder::computeBoundaryPatch(mesh);
                 test::testGeometry(mesh, config);
             }
         });

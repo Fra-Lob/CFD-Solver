@@ -3,5 +3,5 @@
 
 int main()
 {
-    auto mesh = cfd::MeshConverter::read("mesh.mesh");
+    auto mesh = MeshConverter::read("mesh.mesh");
 }

@@ -5,8 +5,6 @@
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <vector>
 
-namespace cfd {
-
 class LinearSystem {
 private:
     std::size_t size_;
@@ -51,4 +49,3 @@ public:
         return b_;
     }
 };
-}

@@ -4,8 +4,8 @@
 #include <exception>
 #include <iostream>
 
-int main()
-{
+int main() {
+    
     test::SuiteReporter reporter("PROCESS TESTS");
     try {
         reporter.subgroup("Steady-state diffusion");

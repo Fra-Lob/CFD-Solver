@@ -3,8 +3,6 @@
 #include <cstddef>
 #include <unordered_map>
 
-namespace cfd {
-
 enum class BoundaryType {
     Dirichlet,
     Neumann
@@ -29,5 +27,3 @@ public:
         return conditions_.at(patchId);
     }
 };
-
-}

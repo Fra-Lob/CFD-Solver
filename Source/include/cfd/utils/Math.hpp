@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace cfd::math {
+namespace math {
 
     using Vector3 = std::array<double, 3>;
 

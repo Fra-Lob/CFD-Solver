@@ -166,30 +166,69 @@ Grid.exe/fast:
 .PHONY : Grid.exe/fast
 
 #=============================================================================
-# Target rules for targets named TestMesh.exe
+# Target rules for targets named MeshTests
 
 # Build rule for target.
-TestMesh.exe: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TestMesh.exe
-.PHONY : TestMesh.exe
+MeshTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 MeshTests
+.PHONY : MeshTests
 
 # fast build rule for target.
-TestMesh.exe/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/build
-.PHONY : TestMesh.exe/fast
+MeshTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshTests.dir/build.make CMakeFiles/MeshTests.dir/build
+.PHONY : MeshTests/fast
 
 #=============================================================================
-# Target rules for targets named TestMeshConverter.exe
+# Target rules for targets named MeshIOTests
 
 # Build rule for target.
-TestMeshConverter.exe: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TestMeshConverter.exe
-.PHONY : TestMeshConverter.exe
+MeshIOTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 MeshIOTests
+.PHONY : MeshIOTests
 
 # fast build rule for target.
-TestMeshConverter.exe/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMeshConverter.exe.dir/build.make CMakeFiles/TestMeshConverter.exe.dir/build
-.PHONY : TestMeshConverter.exe/fast
+MeshIOTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshIOTests.dir/build.make CMakeFiles/MeshIOTests.dir/build
+.PHONY : MeshIOTests/fast
+
+#=============================================================================
+# Target rules for targets named NumericsTests
+
+# Build rule for target.
+NumericsTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 NumericsTests
+.PHONY : NumericsTests
+
+# fast build rule for target.
+NumericsTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NumericsTests.dir/build.make CMakeFiles/NumericsTests.dir/build
+.PHONY : NumericsTests/fast
+
+#=============================================================================
+# Target rules for targets named FieldsTests
+
+# Build rule for target.
+FieldsTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 FieldsTests
+.PHONY : FieldsTests
+
+# fast build rule for target.
+FieldsTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FieldsTests.dir/build.make CMakeFiles/FieldsTests.dir/build
+.PHONY : FieldsTests/fast
+
+#=============================================================================
+# Target rules for targets named ProcessTests
+
+# Build rule for target.
+ProcessTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ProcessTests
+.PHONY : ProcessTests
+
+# fast build rule for target.
+ProcessTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ProcessTests.dir/build.make CMakeFiles/ProcessTests.dir/build
+.PHONY : ProcessTests/fast
 
 apps/grid.o: apps/grid.cpp.o
 .PHONY : apps/grid.o
@@ -383,6 +422,30 @@ src/meshio/VTKConverter.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cfd_core.dir/build.make CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.s
 .PHONY : src/meshio/VTKConverter.cpp.s
 
+src/process/Diffusion.o: src/process/Diffusion.cpp.o
+.PHONY : src/process/Diffusion.o
+
+# target to build an object file
+src/process/Diffusion.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cfd_core.dir/build.make CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o
+.PHONY : src/process/Diffusion.cpp.o
+
+src/process/Diffusion.i: src/process/Diffusion.cpp.i
+.PHONY : src/process/Diffusion.i
+
+# target to preprocess a source file
+src/process/Diffusion.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cfd_core.dir/build.make CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.i
+.PHONY : src/process/Diffusion.cpp.i
+
+src/process/Diffusion.s: src/process/Diffusion.cpp.s
+.PHONY : src/process/Diffusion.s
+
+# target to generate assembly for a file
+src/process/Diffusion.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cfd_core.dir/build.make CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.s
+.PHONY : src/process/Diffusion.cpp.s
+
 src/utils/Math.o: src/utils/Math.cpp.o
 .PHONY : src/utils/Math.o
 
@@ -407,125 +470,125 @@ src/utils/Math.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cfd_core.dir/build.make CMakeFiles/cfd_core.dir/src/utils/Math.cpp.s
 .PHONY : src/utils/Math.cpp.s
 
-tests/mesh/testConnectivity.o: tests/mesh/testConnectivity.cpp.o
-.PHONY : tests/mesh/testConnectivity.o
+tests/fields/FieldsTests.o: tests/fields/FieldsTests.hpp.o
+.PHONY : tests/fields/FieldsTests.o
 
 # target to build an object file
-tests/mesh/testConnectivity.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testConnectivity.cpp.o
-.PHONY : tests/mesh/testConnectivity.cpp.o
+tests/fields/FieldsTests.hpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FieldsTests.dir/build.make CMakeFiles/FieldsTests.dir/tests/fields/FieldsTests.hpp.o
+.PHONY : tests/fields/FieldsTests.hpp.o
 
-tests/mesh/testConnectivity.i: tests/mesh/testConnectivity.cpp.i
-.PHONY : tests/mesh/testConnectivity.i
+tests/fields/FieldsTests.i: tests/fields/FieldsTests.hpp.i
+.PHONY : tests/fields/FieldsTests.i
 
 # target to preprocess a source file
-tests/mesh/testConnectivity.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testConnectivity.cpp.i
-.PHONY : tests/mesh/testConnectivity.cpp.i
+tests/fields/FieldsTests.hpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FieldsTests.dir/build.make CMakeFiles/FieldsTests.dir/tests/fields/FieldsTests.hpp.i
+.PHONY : tests/fields/FieldsTests.hpp.i
 
-tests/mesh/testConnectivity.s: tests/mesh/testConnectivity.cpp.s
-.PHONY : tests/mesh/testConnectivity.s
+tests/fields/FieldsTests.s: tests/fields/FieldsTests.hpp.s
+.PHONY : tests/fields/FieldsTests.s
 
 # target to generate assembly for a file
-tests/mesh/testConnectivity.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testConnectivity.cpp.s
-.PHONY : tests/mesh/testConnectivity.cpp.s
+tests/fields/FieldsTests.hpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FieldsTests.dir/build.make CMakeFiles/FieldsTests.dir/tests/fields/FieldsTests.hpp.s
+.PHONY : tests/fields/FieldsTests.hpp.s
 
-tests/mesh/testGenerator.o: tests/mesh/testGenerator.cpp.o
-.PHONY : tests/mesh/testGenerator.o
+tests/mesh/MeshTests.o: tests/mesh/MeshTests.hpp.o
+.PHONY : tests/mesh/MeshTests.o
 
 # target to build an object file
-tests/mesh/testGenerator.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGenerator.cpp.o
-.PHONY : tests/mesh/testGenerator.cpp.o
+tests/mesh/MeshTests.hpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshTests.dir/build.make CMakeFiles/MeshTests.dir/tests/mesh/MeshTests.hpp.o
+.PHONY : tests/mesh/MeshTests.hpp.o
 
-tests/mesh/testGenerator.i: tests/mesh/testGenerator.cpp.i
-.PHONY : tests/mesh/testGenerator.i
+tests/mesh/MeshTests.i: tests/mesh/MeshTests.hpp.i
+.PHONY : tests/mesh/MeshTests.i
 
 # target to preprocess a source file
-tests/mesh/testGenerator.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGenerator.cpp.i
-.PHONY : tests/mesh/testGenerator.cpp.i
+tests/mesh/MeshTests.hpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshTests.dir/build.make CMakeFiles/MeshTests.dir/tests/mesh/MeshTests.hpp.i
+.PHONY : tests/mesh/MeshTests.hpp.i
 
-tests/mesh/testGenerator.s: tests/mesh/testGenerator.cpp.s
-.PHONY : tests/mesh/testGenerator.s
+tests/mesh/MeshTests.s: tests/mesh/MeshTests.hpp.s
+.PHONY : tests/mesh/MeshTests.s
 
 # target to generate assembly for a file
-tests/mesh/testGenerator.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGenerator.cpp.s
-.PHONY : tests/mesh/testGenerator.cpp.s
+tests/mesh/MeshTests.hpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshTests.dir/build.make CMakeFiles/MeshTests.dir/tests/mesh/MeshTests.hpp.s
+.PHONY : tests/mesh/MeshTests.hpp.s
 
-tests/mesh/testGeometry.o: tests/mesh/testGeometry.cpp.o
-.PHONY : tests/mesh/testGeometry.o
+tests/meshIO/MeshIOTests.o: tests/meshIO/MeshIOTests.hpp.o
+.PHONY : tests/meshIO/MeshIOTests.o
 
 # target to build an object file
-tests/mesh/testGeometry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGeometry.cpp.o
-.PHONY : tests/mesh/testGeometry.cpp.o
+tests/meshIO/MeshIOTests.hpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshIOTests.dir/build.make CMakeFiles/MeshIOTests.dir/tests/meshIO/MeshIOTests.hpp.o
+.PHONY : tests/meshIO/MeshIOTests.hpp.o
 
-tests/mesh/testGeometry.i: tests/mesh/testGeometry.cpp.i
-.PHONY : tests/mesh/testGeometry.i
+tests/meshIO/MeshIOTests.i: tests/meshIO/MeshIOTests.hpp.i
+.PHONY : tests/meshIO/MeshIOTests.i
 
 # target to preprocess a source file
-tests/mesh/testGeometry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGeometry.cpp.i
-.PHONY : tests/mesh/testGeometry.cpp.i
+tests/meshIO/MeshIOTests.hpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshIOTests.dir/build.make CMakeFiles/MeshIOTests.dir/tests/meshIO/MeshIOTests.hpp.i
+.PHONY : tests/meshIO/MeshIOTests.hpp.i
 
-tests/mesh/testGeometry.s: tests/mesh/testGeometry.cpp.s
-.PHONY : tests/mesh/testGeometry.s
+tests/meshIO/MeshIOTests.s: tests/meshIO/MeshIOTests.hpp.s
+.PHONY : tests/meshIO/MeshIOTests.s
 
 # target to generate assembly for a file
-tests/mesh/testGeometry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testGeometry.cpp.s
-.PHONY : tests/mesh/testGeometry.cpp.s
+tests/meshIO/MeshIOTests.hpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/MeshIOTests.dir/build.make CMakeFiles/MeshIOTests.dir/tests/meshIO/MeshIOTests.hpp.s
+.PHONY : tests/meshIO/MeshIOTests.hpp.s
 
-tests/mesh/testMesh.o: tests/mesh/testMesh.cpp.o
-.PHONY : tests/mesh/testMesh.o
+tests/numerics/NumericsTests.o: tests/numerics/NumericsTests.hpp.o
+.PHONY : tests/numerics/NumericsTests.o
 
 # target to build an object file
-tests/mesh/testMesh.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testMesh.cpp.o
-.PHONY : tests/mesh/testMesh.cpp.o
+tests/numerics/NumericsTests.hpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NumericsTests.dir/build.make CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.o
+.PHONY : tests/numerics/NumericsTests.hpp.o
 
-tests/mesh/testMesh.i: tests/mesh/testMesh.cpp.i
-.PHONY : tests/mesh/testMesh.i
+tests/numerics/NumericsTests.i: tests/numerics/NumericsTests.hpp.i
+.PHONY : tests/numerics/NumericsTests.i
 
 # target to preprocess a source file
-tests/mesh/testMesh.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testMesh.cpp.i
-.PHONY : tests/mesh/testMesh.cpp.i
+tests/numerics/NumericsTests.hpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NumericsTests.dir/build.make CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.i
+.PHONY : tests/numerics/NumericsTests.hpp.i
 
-tests/mesh/testMesh.s: tests/mesh/testMesh.cpp.s
-.PHONY : tests/mesh/testMesh.s
+tests/numerics/NumericsTests.s: tests/numerics/NumericsTests.hpp.s
+.PHONY : tests/numerics/NumericsTests.s
 
 # target to generate assembly for a file
-tests/mesh/testMesh.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMesh.exe.dir/build.make CMakeFiles/TestMesh.exe.dir/tests/mesh/testMesh.cpp.s
-.PHONY : tests/mesh/testMesh.cpp.s
+tests/numerics/NumericsTests.hpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NumericsTests.dir/build.make CMakeFiles/NumericsTests.dir/tests/numerics/NumericsTests.hpp.s
+.PHONY : tests/numerics/NumericsTests.hpp.s
 
-tests/mesh/testMeshConverter.o: tests/mesh/testMeshConverter.cpp.o
-.PHONY : tests/mesh/testMeshConverter.o
+tests/process/ProcessTests.o: tests/process/ProcessTests.hpp.o
+.PHONY : tests/process/ProcessTests.o
 
 # target to build an object file
-tests/mesh/testMeshConverter.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMeshConverter.exe.dir/build.make CMakeFiles/TestMeshConverter.exe.dir/tests/mesh/testMeshConverter.cpp.o
-.PHONY : tests/mesh/testMeshConverter.cpp.o
+tests/process/ProcessTests.hpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ProcessTests.dir/build.make CMakeFiles/ProcessTests.dir/tests/process/ProcessTests.hpp.o
+.PHONY : tests/process/ProcessTests.hpp.o
 
-tests/mesh/testMeshConverter.i: tests/mesh/testMeshConverter.cpp.i
-.PHONY : tests/mesh/testMeshConverter.i
+tests/process/ProcessTests.i: tests/process/ProcessTests.hpp.i
+.PHONY : tests/process/ProcessTests.i
 
 # target to preprocess a source file
-tests/mesh/testMeshConverter.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMeshConverter.exe.dir/build.make CMakeFiles/TestMeshConverter.exe.dir/tests/mesh/testMeshConverter.cpp.i
-.PHONY : tests/mesh/testMeshConverter.cpp.i
+tests/process/ProcessTests.hpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ProcessTests.dir/build.make CMakeFiles/ProcessTests.dir/tests/process/ProcessTests.hpp.i
+.PHONY : tests/process/ProcessTests.hpp.i
 
-tests/mesh/testMeshConverter.s: tests/mesh/testMeshConverter.cpp.s
-.PHONY : tests/mesh/testMeshConverter.s
+tests/process/ProcessTests.s: tests/process/ProcessTests.hpp.s
+.PHONY : tests/process/ProcessTests.s
 
 # target to generate assembly for a file
-tests/mesh/testMeshConverter.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/TestMeshConverter.exe.dir/build.make CMakeFiles/TestMeshConverter.exe.dir/tests/mesh/testMeshConverter.cpp.s
-.PHONY : tests/mesh/testMeshConverter.cpp.s
+tests/process/ProcessTests.hpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ProcessTests.dir/build.make CMakeFiles/ProcessTests.dir/tests/process/ProcessTests.hpp.s
+.PHONY : tests/process/ProcessTests.hpp.s
 
 # Help Target
 help:
@@ -536,10 +599,13 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... FieldsTests"
 	@echo "... Grid.exe"
 	@echo "... Main.exe"
-	@echo "... TestMesh.exe"
-	@echo "... TestMeshConverter.exe"
+	@echo "... MeshIOTests"
+	@echo "... MeshTests"
+	@echo "... NumericsTests"
+	@echo "... ProcessTests"
 	@echo "... cfd_core"
 	@echo "... apps/grid.o"
 	@echo "... apps/grid.i"
@@ -565,24 +631,27 @@ help:
 	@echo "... src/meshio/VTKConverter.o"
 	@echo "... src/meshio/VTKConverter.i"
 	@echo "... src/meshio/VTKConverter.s"
+	@echo "... src/process/Diffusion.o"
+	@echo "... src/process/Diffusion.i"
+	@echo "... src/process/Diffusion.s"
 	@echo "... src/utils/Math.o"
 	@echo "... src/utils/Math.i"
 	@echo "... src/utils/Math.s"
-	@echo "... tests/mesh/testConnectivity.o"
-	@echo "... tests/mesh/testConnectivity.i"
-	@echo "... tests/mesh/testConnectivity.s"
-	@echo "... tests/mesh/testGenerator.o"
-	@echo "... tests/mesh/testGenerator.i"
-	@echo "... tests/mesh/testGenerator.s"
-	@echo "... tests/mesh/testGeometry.o"
-	@echo "... tests/mesh/testGeometry.i"
-	@echo "... tests/mesh/testGeometry.s"
-	@echo "... tests/mesh/testMesh.o"
-	@echo "... tests/mesh/testMesh.i"
-	@echo "... tests/mesh/testMesh.s"
-	@echo "... tests/mesh/testMeshConverter.o"
-	@echo "... tests/mesh/testMeshConverter.i"
-	@echo "... tests/mesh/testMeshConverter.s"
+	@echo "... tests/fields/FieldsTests.o"
+	@echo "... tests/fields/FieldsTests.i"
+	@echo "... tests/fields/FieldsTests.s"
+	@echo "... tests/mesh/MeshTests.o"
+	@echo "... tests/mesh/MeshTests.i"
+	@echo "... tests/mesh/MeshTests.s"
+	@echo "... tests/meshIO/MeshIOTests.o"
+	@echo "... tests/meshIO/MeshIOTests.i"
+	@echo "... tests/meshIO/MeshIOTests.s"
+	@echo "... tests/numerics/NumericsTests.o"
+	@echo "... tests/numerics/NumericsTests.i"
+	@echo "... tests/numerics/NumericsTests.s"
+	@echo "... tests/process/ProcessTests.o"
+	@echo "... tests/process/ProcessTests.i"
+	@echo "... tests/process/ProcessTests.s"
 .PHONY : help
 
 

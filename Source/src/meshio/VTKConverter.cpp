@@ -8,7 +8,6 @@
 #include <set>
 #include <stdexcept>
 
-namespace cfd {
 namespace {
 
 std::string escapeXml(const std::string& value)
@@ -187,6 +186,4 @@ void VTKConverter::write(
     if (!file) {
         throw std::runtime_error("VTKConverter: failed writing file: " + filename);
     }
-}
-
 }

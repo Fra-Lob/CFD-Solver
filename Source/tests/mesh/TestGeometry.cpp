@@ -13,8 +13,8 @@
 namespace test {
 
 void testGeometry(
-    const cfd::Mesh& mesh,
-    const cfd::MeshConfig& config)
+    const Mesh& mesh,
+    const MeshConfig& config)
 {
     const std::size_t nCells = mesh.cells.getNumber();
     const std::size_t nFaces = mesh.faces.getNumber();
@@ -73,23 +73,23 @@ void testGeometry(
 
         if (mesh.faces.isBoundary(faceId)) {
             const auto domain = mesh.getDomain();
-            const auto tolerance = cfd::constants::TINY *
+            const auto tolerance = constants::TINY *
                 std::max({1.0, domain[0], domain[1], domain[2]});
             const auto patchId = mesh.faces.getBoundaryPatchId(faceId);
             const auto expectedPatch =
                 std::abs(center[0]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::XMin)
+                    ? static_cast<std::size_t>(CartesianPatch::XMin)
                 : std::abs(center[0] - domain[0]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::XMax)
+                    ? static_cast<std::size_t>(CartesianPatch::XMax)
                 : std::abs(center[1]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::YMin)
+                    ? static_cast<std::size_t>(CartesianPatch::YMin)
                 : std::abs(center[1] - domain[1]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::YMax)
+                    ? static_cast<std::size_t>(CartesianPatch::YMax)
                 : std::abs(center[2]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::ZMin)
+                    ? static_cast<std::size_t>(CartesianPatch::ZMin)
                 : std::abs(center[2] - domain[2]) <= tolerance
-                    ? static_cast<std::size_t>(cfd::CartesianPatch::ZMax)
-                    : cfd::constants::invalidId;
+                    ? static_cast<std::size_t>(CartesianPatch::ZMax)
+                    : constants::invalidId;
             require(patchId == expectedPatch, "Geometry: incorrect Cartesian boundary patch");
         }
 

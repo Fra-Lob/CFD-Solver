@@ -14,6 +14,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lobre/CFD_solver/Source/src/meshio/MeshConverter.cpp" "CMakeFiles/cfd_core.dir/src/meshio/MeshConverter.cpp.o" "gcc" "CMakeFiles/cfd_core.dir/src/meshio/MeshConverter.cpp.o.d"
   "/home/lobre/CFD_solver/Source/src/meshio/MeshGenerator.cpp" "CMakeFiles/cfd_core.dir/src/meshio/MeshGenerator.cpp.o" "gcc" "CMakeFiles/cfd_core.dir/src/meshio/MeshGenerator.cpp.o.d"
   "/home/lobre/CFD_solver/Source/src/meshio/VTKConverter.cpp" "CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o" "gcc" "CMakeFiles/cfd_core.dir/src/meshio/VTKConverter.cpp.o.d"
+  "/home/lobre/CFD_solver/Source/src/process/Diffusion.cpp" "CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o" "gcc" "CMakeFiles/cfd_core.dir/src/process/Diffusion.cpp.o.d"
   "/home/lobre/CFD_solver/Source/src/utils/Math.cpp" "CMakeFiles/cfd_core.dir/src/utils/Math.cpp.o" "gcc" "CMakeFiles/cfd_core.dir/src/utils/Math.cpp.o.d"
   )
 

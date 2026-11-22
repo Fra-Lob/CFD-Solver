@@ -4,8 +4,6 @@
 #include <cfd/numerics/LinearSystem.hpp>
 #include <cfd/physics/BoundaryConditions.hpp> 
 
-namespace cfd {
-
 class Diffusion {
 public:
     static void assemble(
@@ -15,5 +13,3 @@ public:
         LinearSystem& system
     );
 };
-
-}

@@ -5,13 +5,13 @@ namespace {
 
 void testNodesConstructor()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     require(mesh.nodes.getNumber() == 0, "Empty mesh starts without nodes");
 }
 
 void testNodeAddition()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     mesh.nodes.addCoordinates(0.0, 0.0, 0.0);
     mesh.nodes.addCoordinates(1.0, 1.0, 1.0);
     mesh.nodes.addCoordinates(1.0, 0.0, 1.0);
@@ -26,7 +26,7 @@ void testNodeAddition()
 
 void testInvalidNodeIndex()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     mesh.nodes.addCoordinates(0.0, 0.0, 0.0);
     bool threw = false;
     try {
@@ -39,13 +39,13 @@ void testInvalidNodeIndex()
 
 void testFacesConstructor()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     require(mesh.faces.getNumber() == 0, "Empty mesh starts without faces");
 }
 
 void testFaceAddition()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     mesh.faces.addByNodes({0, 1, 2, 3}, 0, 1);
     mesh.faces.addByNodes({4, 5, 6, 7}, 1);
     require(mesh.faces.getNumber() == 2, "Face count after addition");
@@ -56,12 +56,12 @@ void testFaceAddition()
     require(mesh.faces.getNodes(1) == std::array<std::size_t, 4>{4, 5, 6, 7},
             "Second face nodes");
     require(mesh.faces.getOwner(1) == 1, "Second face owner");
-    require(mesh.faces.getNeighbor(1) == cfd::constants::invalidId, "Boundary face neighbor");
+    require(mesh.faces.getNeighbor(1) == constants::invalidId, "Boundary face neighbor");
 }
 
 void testInvalidFaceIndex()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     mesh.faces.addByNodes({0, 1, 2, 3}, 0, 1);
     bool threw = false;
     try {
@@ -74,7 +74,7 @@ void testInvalidFaceIndex()
 
 void testBoundaryCheck()
 {
-    cfd::Mesh mesh;
+    Mesh mesh;
     mesh.faces.addByNodes({0, 1, 2, 3}, 0, 1);
     mesh.faces.addByNodes({4, 5, 6, 7}, 1);
     require(!mesh.faces.isBoundary(0), "Face with a neighbor is internal");

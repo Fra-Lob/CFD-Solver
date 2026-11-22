@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <limits>
 
-namespace cfd::constants {
+namespace constants {
 
     inline constexpr std::size_t invalidId =
         std::numeric_limits<std::size_t>::max();

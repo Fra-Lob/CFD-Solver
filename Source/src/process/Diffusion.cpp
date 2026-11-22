@@ -2,10 +2,10 @@
 #include <cfd/process/Diffusion.hpp>
 #include <cstddef>
 
-void cfd::Diffusion::assemble(const cfd::Mesh& mesh,
+void Diffusion::assemble(const Mesh& mesh,
                     double gamma,
-              const cfd::BoundaryConditions& bc,
-                    cfd::LinearSystem& system) {
+              const BoundaryConditions& bc,
+                    LinearSystem& system) {
     
     std::size_t nFaces = mesh.faces.getNumber();
     for (std::size_t faceId = 0; faceId < nFaces; faceId++) {
@@ -21,10 +21,8 @@ void cfd::Diffusion::assemble(const cfd::Mesh& mesh,
             auto neighbourId = mesh.faces.getNeighbor(faceId);
             auto neighbourCenter = mesh.cells.getCenter(neighbourId);
             
-            double distance = cfd::math::norm(cfd::math::vectorSum(
-                ownerCenter,
-                cfd::math::opposite(neighbourCenter)
-            ));
+            double distance = math::norm(math::vectorSum(ownerCenter,
+                                                           math::opposite(neighbourCenter)));
             double coefficient = gamma * mesh.faces.getArea(faceId) / distance;
 
             system.addCoefficient(ownerId,     ownerId,     coefficient);   // A_PP
@@ -37,15 +35,13 @@ void cfd::Diffusion::assemble(const cfd::Mesh& mesh,
         // ------------------------------------------------------ //
         else {
             auto faceCenter = mesh.faces.getCenter(faceId);
-            double distance = cfd::math::norm(cfd::math::vectorSum(
-                ownerCenter,
-                cfd::math::opposite(faceCenter)
-            ));
+            double distance = math::norm(math::vectorSum(ownerCenter,
+                                                            math::opposite(faceCenter)));
 
             auto condition = bc.get(mesh.faces.getBoundaryPatchId(faceId));
 
             // Dirichlet Conditions
-            if (condition.type == cfd::BoundaryType::Dirichlet) {
+            if (condition.type == BoundaryType::Dirichlet) {
                 double coefficient = gamma * mesh.faces.getArea(faceId) / distance;
 
                 system.addCoefficient(ownerId, ownerId, coefficient);
@@ -53,7 +49,7 @@ void cfd::Diffusion::assemble(const cfd::Mesh& mesh,
             }
 
             // Neumann Conditions
-            if (condition.type == cfd::BoundaryType::Neumann) {
+            if (condition.type == BoundaryType::Neumann) {
                 double coefficient = gamma * mesh.faces.getArea(faceId);
 
                 system.addRHS(ownerId, coefficient * condition.value);

@@ -50,6 +50,9 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/cfd_core.dir/DependInfo.cmake"
   "CMakeFiles/Main.exe.dir/DependInfo.cmake"
   "CMakeFiles/Grid.exe.dir/DependInfo.cmake"
-  "CMakeFiles/TestMesh.exe.dir/DependInfo.cmake"
-  "CMakeFiles/TestMeshConverter.exe.dir/DependInfo.cmake"
+  "CMakeFiles/MeshTests.dir/DependInfo.cmake"
+  "CMakeFiles/MeshIOTests.dir/DependInfo.cmake"
+  "CMakeFiles/NumericsTests.dir/DependInfo.cmake"
+  "CMakeFiles/FieldsTests.dir/DependInfo.cmake"
+  "CMakeFiles/ProcessTests.dir/DependInfo.cmake"
   )
