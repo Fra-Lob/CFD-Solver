@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/Main.exe.dir/link.d CMakeFiles/Main.exe.dir/apps/main.cpp.o -o /home/lobre/CFD_solver/Bin/Main.exe  libcfd_core.a

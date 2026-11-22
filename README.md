@@ -40,9 +40,10 @@ produce exceptions. No external XML or VTK library is required.
 Structured node/cell dimensions are recovered when the complete connectivity
 matches the generator's indexing convention, including sheared meshes.
 Otherwise these dimensions remain zero; access the mesh by node/cell IDs.
-PointData, CellData and FieldData are ignored: solution fields and boundary
-patch labels are not imported. Boundary patch IDs remain INVALID_ID and must
-be assigned before applying boundary conditions.
+Boundary patch IDs are stored in the writer's `boundaryPatchIds` CellData
+array, with one value per local face, and restored by the reader. Files that
+omit this array leave patch IDs unassigned. Other PointData, CellData and
+FieldData are ignored; solution fields are not imported.
 
 ## Requirements
 
@@ -53,7 +54,9 @@ be assigned before applying boundary conditions.
 ## Build
 
 ```bash
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-./build/cfd-hpc
+cmake -S Source -B Bin/build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build Bin/build
+
+
+ctest --test-dir Bin/build --output-on-failure
 ```

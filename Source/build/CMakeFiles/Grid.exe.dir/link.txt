@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/Grid.exe.dir/link.d CMakeFiles/Grid.exe.dir/apps/grid.cpp.o -o /home/lobre/CFD_solver/Bin/Grid.exe  libcfd_core.a

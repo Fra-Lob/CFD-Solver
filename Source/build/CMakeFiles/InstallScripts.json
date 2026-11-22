@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/lobre/CFD_solver/Source/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
