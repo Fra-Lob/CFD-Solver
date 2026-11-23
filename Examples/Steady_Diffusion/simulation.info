@@ -16,12 +16,8 @@ diffusivity = 1.0, 1.0
 #                          Time                            #
 #==========================================================#
 initialValues = 300.0, 150.0
-mode = steady
-
-#==========================================================#
-#                     Linear Solver                        #
-#==========================================================#
-method = conjugateGradient
+dt = 1.0
+timesteps = 0
 tolerance = 1e-10
 maxIterations = 10000
 
@@ -56,8 +52,8 @@ value =     0.0,     0.0
 #                         Output                           #
 #==========================================================#
 directory = results
-vtk = true
-csv = true
+vtk = true, 1
+csv = true, 1
 csv start points = (0., 0.5, 0.5), (1., 0., 0.5)
 csv end   points = (2., 0.5, 0.5), (1., 1., 0.5)
 csv resolution   = 100, 10

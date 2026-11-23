@@ -3,6 +3,7 @@
 #include <mesh/MeshBuilder.hpp>
 #include <meshio/MeshConverter.hpp>
 
+#include <algorithm>
 #include <charconv>
 #include <cmath>
 #include <fstream>
@@ -19,6 +20,17 @@ namespace {
         if (first == std::string::npos) return {};
         const auto last = value.find_last_not_of(" \t\r\n");
         return value.substr(first, last - first + 1);
+    }
+
+    std::string normalizeKey(const std::string& value) {
+        std::istringstream input(trim(value));
+        std::string word;
+        std::string result;
+        while (input >> word) {
+            if (!result.empty()) result += ' ';
+            result += word;
+        }
+        return result;
     }
 
     std::vector<std::string> split(const std::string& value) {
@@ -61,6 +73,70 @@ namespace {
         if (value == "true" || value == "True" || value == "TRUE" || value == "1") return true;
         if (value == "false" || value == "False" || value == "FALSE" || value == "0") return false;
         throw std::runtime_error("Invalid boolean value '" + text + "'");
+    }
+
+    void parseOutputSetting(
+        const std::string& text,
+        const std::string& name,
+        bool& enabled,
+        std::size_t& interval
+    ) {
+        std::string normalized = text;
+        std::replace(normalized.begin(), normalized.end(), ',', ' ');
+        std::istringstream input(normalized);
+        std::vector<std::string> tokens;
+        std::string token;
+        while (input >> token) tokens.push_back(token);
+        if (tokens.empty() || tokens.size() > 2) {
+            throw std::runtime_error(
+                "Expected '" + name + " = <bool>, <interval>'"
+            );
+        }
+        enabled = parseBool(tokens[0]);
+        if (!enabled) {
+            interval = 0;
+            return;
+        }
+        if (tokens.size() != 2) {
+            throw std::runtime_error(
+                "Enabled " + name + " output requires a save interval"
+            );
+        }
+        interval = parseSize(tokens[1]);
+        if (interval == 0) {
+            throw std::runtime_error(name + " output interval must be positive");
+        }
+    }
+
+    std::vector<std::array<double, 3>> parsePoints(const std::string& text) {
+        std::vector<std::array<double, 3>> points;
+        std::size_t position = 0;
+        while (position < text.size()) {
+            while (position < text.size()
+                   && (text[position] == ' ' || text[position] == '\t'
+                       || text[position] == ',')) {
+                ++position;
+            }
+            if (position == text.size()) break;
+            if (text[position] != '(') {
+                throw std::runtime_error("Expected '(' in CSV point list");
+            }
+            const auto end = text.find(')', position + 1);
+            if (end == std::string::npos) {
+                throw std::runtime_error("Missing ')' in CSV point list");
+            }
+            const auto coordinates = split(text.substr(position + 1, end - position - 1));
+            if (coordinates.size() != 3) {
+                throw std::runtime_error("Each CSV point must have three coordinates");
+            }
+            points.push_back({
+                parseDouble(coordinates[0]),
+                parseDouble(coordinates[1]),
+                parseDouble(coordinates[2])
+            });
+            position = end + 1;
+        }
+        return points;
     }
 
     std::size_t parsePatch(const std::string& name) {
@@ -111,7 +187,8 @@ CaseReader::LoadedCase CaseReader::load() {
 }
 
 CaseReader::LoadedCase CaseReader::load(const std::string& filename) {
-    const auto base = read(filename);
+    OutputConfig output;
+    const auto base = read(filename, 0, output);
 
     std::filesystem::path meshFile(base.meshFile);
     if (meshFile.extension().empty()) meshFile += ".mesh";
@@ -127,8 +204,8 @@ CaseReader::LoadedCase CaseReader::load(const std::string& filename) {
     }
 
     Mesh mesh = MeshConverter::read(meshFile.string());
-    SimulationConfig config = read(filename, mesh.cells.getNumber());
-    return {config, std::move(mesh)};
+    SimulationConfig config = read(filename, mesh.cells.getNumber(), output);
+    return {std::move(config), std::move(output), std::move(mesh)};
 }
 
 SimulationConfig CaseReader::read(const std::string& filename)
@@ -138,8 +215,17 @@ SimulationConfig CaseReader::read(const std::string& filename)
 
 SimulationConfig CaseReader::read(const std::string& filename, std::size_t cellCount)
 {
+    OutputConfig output;
+    return read(filename, cellCount, output);
+}
+
+SimulationConfig CaseReader::read(
+    const std::string& filename,
+    std::size_t cellCount,
+    OutputConfig& output
+) {
     try {
-        return readImpl(filename, cellCount);
+        return readImpl(filename, cellCount, output);
     } catch (const std::exception& error) {
         throw std::runtime_error(
             "Cannot read case file '" + filename + "': " + error.what()
@@ -147,11 +233,16 @@ SimulationConfig CaseReader::read(const std::string& filename, std::size_t cellC
     }
 }
 
-SimulationConfig CaseReader::readImpl(const std::string& filename, std::size_t cellCount)
+SimulationConfig CaseReader::readImpl(
+    const std::string& filename,
+    std::size_t cellCount,
+    OutputConfig& output
+)
 {
     std::ifstream file(filename);
     if (!file) throw std::runtime_error("Cannot open case file '" + filename + "'");
 
+    output = OutputConfig{};
     SimulationConfig config;
     std::unordered_map<std::string, std::string> values;
     std::unordered_map<std::size_t,
@@ -169,10 +260,11 @@ SimulationConfig CaseReader::readImpl(const std::string& filename, std::size_t c
         }
 
         const auto separator = line.find('=');
-        const auto key = trim(line.substr(0, separator));
+        const auto key = normalizeKey(line.substr(0, separator));
         const auto value = trim(line.substr(separator + 1));
 
-        if (key == "directory" || key == "vtk") {
+        if (key == "directory" || key == "vtk" || key == "csv"
+            || key.rfind("csv ", 0) == 0) {
             values[key] = value;
         } else if (section == "xmin" || section == "xmax" || section == "ymin"
             || section == "ymax" || section == "zmin" || section == "zmax") {
@@ -193,27 +285,43 @@ SimulationConfig CaseReader::readImpl(const std::string& filename, std::size_t c
     if (file.bad()) throw std::runtime_error("Failed reading case file '" + filename + "'");
 
     try {
-        config.name = values.at("name");
+        output.fileName = values.at("name");
         config.type = values.at("type");
         config.meshFile = values.at("mesh");
-        config.mode = values.at("mode");
-        config.linearSolver = values.at("method");
+        config.timeStep = parseDouble(values.at("dt"));
+        config.timeSteps = parseSize(values.at("timesteps"));
         config.tolerance = parseDouble(values.at("tolerance"));
         config.maxIterations = parseSize(values.at("maxIterations"));
-        config.transient = config.mode != "steady";
-        if (values.count("timeStep")) {
-            config.timeStep = parseDouble(values.at("timeStep"));
+        config.density = values.count("density")
+            ? parseDouble(values.at("density"))
+            : 1.0;
+        output.outputDirectory = values.count("directory")
+            ? values.at("directory")
+            : "results";
+        if (values.count("vtk")) {
+            parseOutputSetting(
+                values.at("vtk"), "vtu", output.writeVtk, output.vtkInterval
+            );
         }
-        if (values.count("endTime")) {
-            config.endTime = parseDouble(values.at("endTime"));
+        if (values.count("csv")) {
+            parseOutputSetting(
+                values.at("csv"), "csv", output.writeCsv, output.csvInterval
+            );
         }
-        config.outputDirectory = values.count("directory") ? values.at("directory") : "results";
-        config.writeVtk = values.count("vtk") ? parseBool(values.at("vtk")) : false;
     } catch (const std::out_of_range& error) {
         throw std::runtime_error(
             "Missing required key '" + std::string(error.what()) +
             "' in case file '" + filename + "'"
         );
+    }
+
+    if (config.timeSteps > 0) {
+        if (config.timeStep <= 0.0) {
+            throw std::runtime_error("dt must be positive when timesteps is greater than zero");
+        }
+        if (config.density <= 0.0) {
+            throw std::runtime_error("density must be positive for transient simulations");
+        }
     }
 
     if (!values.count("scalar fields") || !values.count("diffusivity")
@@ -230,6 +338,36 @@ SimulationConfig CaseReader::readImpl(const std::string& filename, std::size_t c
     }
     if (initialValues.size() != fieldNames.size()) {
         throw std::runtime_error("initialValues count does not match scalar-field count");
+    }
+
+    if (output.writeCsv) {
+        if (!values.count("csv start points") || !values.count("csv end points")
+            || !values.count("csv resolution")) {
+            throw std::runtime_error(
+                "csv=true requires csv start points, csv end points and csv resolution"
+            );
+        }
+        const auto startPoints = parsePoints(values.at("csv start points"));
+        const auto endPoints = parsePoints(values.at("csv end points"));
+        const auto resolutions = split(values.at("csv resolution"));
+        if (startPoints.empty() || startPoints.size() != endPoints.size()
+            || startPoints.size() != resolutions.size()) {
+            throw std::runtime_error(
+                "CSV start points, end points and resolutions must have matching counts"
+            );
+        }
+        output.csvLines.reserve(startPoints.size());
+        for (std::size_t line = 0; line < startPoints.size(); ++line) {
+            const auto resolution = parseSize(resolutions[line]);
+            if (resolution == 0) {
+                throw std::runtime_error("CSV line resolution must be positive");
+            }
+            output.csvLines.push_back({
+                startPoints[line],
+                endPoints[line],
+                resolution
+            });
+        }
     }
 
     config.scalarFields.reserve(fieldNames.size());

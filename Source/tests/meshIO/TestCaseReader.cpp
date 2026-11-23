@@ -24,8 +24,8 @@ void testCaseReader()
              << "scalar fields = C1, C2\n"
              << "diffusivity = 1.0, 0.5\n"
              << "initialValues = 300.0, 150.0\n"
-             << "mode = steady\n"
-             << "method = conjugateGradient\n"
+             << "dt = 0.1\n"
+             << "timesteps = 0\n"
              << "tolerance = 1e-10\n"
              << "maxIterations = 10000\n"
              << "xmin\n"
@@ -35,12 +35,17 @@ void testCaseReader()
              << "type = Dirichlet, Dirichlet\n"
              << "value = 0.0, 10.0\n"
              << "directory = results\n"
-             << "vtk = true\n";
+             << "vtk = true, 2\n"
+             << "csv = true, 4\n"
+             << "csv start points = (0, 0, 0), (1, 1, 1)\n"
+             << "csv end   points = (1, 0, 0), (2, 1, 1)\n"
+             << "csv resolution = 3, 5\n";
     }
 
     try {
-        auto config = CaseReader::read(path, 12);
-        require(config.name == "TestCase", "Case reader simulation name");
+        OutputConfig output;
+        auto config = CaseReader::read(path, 12, output);
+        require(output.fileName == "TestCase", "Case reader output file name");
         require(config.type == "scalarTransport", "Case reader simulation type");
         require(config.meshFile == "TestMesh", "Case reader mesh file");
         require(config.scalarFields.size() == 2, "Case reader scalar-field collection");
@@ -53,11 +58,19 @@ void testCaseReader()
         require(config.scalarFields[0].getNumber() == 12, "Scalar field cell count");
         require(approx(config.scalarFields[1].getValue(11), 150.0),
                 "Scalar field initial-value initialization");
-        require(config.linearSolver == "conjugateGradient", "Case reader linear solver");
+        require(config.timeSteps == 0, "Case reader steady-state timestep count");
+        require(approx(config.timeStep, 0.1), "Case reader timestep size");
         require(approx(config.tolerance, 1e-10), "Case reader solver tolerance");
         require(config.maxIterations == 10000, "Case reader maximum iterations");
-        require(config.writeVtk, "Case reader VTK output flag");
-        require(config.outputDirectory == "results", "Case reader output directory");
+        require(output.writeVtk, "Case reader VTK output flag");
+        require(output.vtkInterval == 2, "Case reader VTK output interval");
+        require(output.writeCsv, "Case reader CSV output flag");
+        require(output.csvInterval == 4, "Case reader CSV output interval");
+        require(output.csvLines.size() == 2, "Case reader CSV line collection");
+        require(output.csvLines[0].resolution == 3, "Case reader first CSV resolution");
+        require(approx(output.csvLines[1].endPoint[0], 2.0),
+                "Case reader second CSV endpoint");
+        require(output.outputDirectory == "results", "Case reader output directory");
         require(config.scalarFields[0].getBoundaryConditions().get(
                     static_cast<std::size_t>(CartesianPatch::XMin)).type
                     == BoundaryType::Dirichlet,
@@ -65,6 +78,33 @@ void testCaseReader()
         require(approx(config.scalarFields[1].getBoundaryConditions().get(
                            static_cast<std::size_t>(CartesianPatch::XMax)).value, 10.0),
                 "Case reader field boundary value");
+
+        const std::string transientPath = "case-reader-transient-test.info";
+        {
+            std::ofstream file(transientPath);
+            file << "name = TransientTest.vtu\n"
+                 << "type = scalarTransport\n"
+                 << "mesh = TestMesh\n"
+                 << "scalar fields = C\n"
+                 << "diffusivity = 1.0\n"
+                 << "initialValues = 0.0\n"
+                 << "density = 2.0\n"
+                 << "dt = 0.25\n"
+                 << "timesteps = 3\n"
+                 << "tolerance = 1e-10\n"
+                 << "maxIterations = 100\n";
+        }
+        OutputConfig transientOutput;
+        const auto transientConfig = CaseReader::read(transientPath, 12, transientOutput);
+        require(transientConfig.timeSteps == 3,
+                "Case reader recognizes transient simulations by timestep count");
+        require(approx(transientConfig.timeStep, 0.25),
+                "Case reader transient timestep size");
+        require(approx(transientConfig.density, 2.0),
+                "Case reader transient density");
+        require(!transientOutput.writeVtk && !transientOutput.writeCsv,
+                "Case reader defaults output flags to disabled");
+        std::filesystem::remove(transientPath);
 
         auto mesh = MeshGenerator::generate({1.0, 1.0, 1.0, 3, 2, 2});
         MeshBuilder::computeConnectivity(mesh);
@@ -79,6 +119,8 @@ void testCaseReader()
                 "Case reader initializes fields after mesh loading");
         require(loaded.config.scalarFields[0].getNumber() == 12,
                 "Loaded scalar fields match mesh cells");
+        require(loaded.output.csvInterval == 4,
+                "Case reader returns output configuration");
         std::filesystem::remove(meshPath);
 
         config.scalarFields[0].fill(25.0);
@@ -97,11 +139,13 @@ void testCaseReader()
         std::filesystem::remove(vtkPath);
     } catch (...) {
         std::filesystem::remove(path);
+        std::filesystem::remove("case-reader-transient-test.info");
         std::filesystem::remove("TestMesh.mesh");
         std::filesystem::remove("case-reader-fields.vtu");
         throw;
     }
     std::filesystem::remove(path);
+    std::filesystem::remove("case-reader-transient-test.info");
 }
 
 }

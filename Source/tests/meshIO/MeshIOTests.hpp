@@ -4,6 +4,7 @@
 #include "TestGenerator.cpp"
 #include "TestMeshConverter.cpp"
 #include "TestCaseReader.cpp"
+#include "TestCSVExporter.cpp"
 
 #include <exception>
 #include <iostream>
@@ -27,6 +28,9 @@ int main() {
         reporter.subgroup("Case reader");
         reporter.run("key-value parsing, scalar fields and boundary conditions",
                      test::testCaseReader);
+        reporter.subgroup("CSV exporter");
+        reporter.run("uniform line sampling, scalar interpolation and Dirichlet/Neumann faces",
+                     test::testCSVExporter);
         reporter.passed();
         return 0;
     } catch (const std::exception& error) {

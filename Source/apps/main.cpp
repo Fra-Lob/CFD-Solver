@@ -8,10 +8,10 @@ int main() {
     
     auto loaded = CaseReader::load();
 
-    std::cout << "Loaded case '" << loaded.config.name << "' with "
+    std::cout << "Loaded case '" << loaded.output.fileName << "' with "
               << loaded.config.scalarFields.size() << " scalar field(s)\n";
 
-    SimulationRunner::run(loaded.mesh, loaded.config);
+    SimulationRunner::run(loaded.mesh, loaded.config, loaded.output);
     
     return 0;
 }

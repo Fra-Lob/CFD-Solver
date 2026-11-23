@@ -1,6 +1,7 @@
 #pragma once
 
 #include <io/SimulationConfig.hpp>
+#include <io/OutputConfig.hpp>
 #include <mesh/Mesh.hpp>
 
 #include <cstddef>
@@ -10,6 +11,7 @@ class CaseReader {
 public:
     struct LoadedCase {
         SimulationConfig config;
+        OutputConfig output;
         Mesh mesh;
     };
 
@@ -17,7 +19,16 @@ public:
     static LoadedCase load(const std::string& filename);
     static SimulationConfig read(const std::string& filename);
     static SimulationConfig read(const std::string& filename, std::size_t cellCount);
+    static SimulationConfig read(
+        const std::string& filename,
+        std::size_t cellCount,
+        OutputConfig& output
+    );
 
 private:
-    static SimulationConfig readImpl(const std::string& filename, std::size_t cellCount);
+    static SimulationConfig readImpl(
+        const std::string& filename,
+        std::size_t cellCount,
+        OutputConfig& output
+    );
 };
