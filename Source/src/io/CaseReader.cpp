@@ -1,3 +1,4 @@
+#include "fields/VectorField.hpp"
 #include <io/CaseReader.hpp>
 
 #include <mesh/MeshBuilder.hpp>
@@ -13,15 +14,19 @@
 #include <stdexcept>
 #include <unordered_map>
 
+// ====================================================================================== //
 namespace {
 
+    // Removing all blancks in a string
     std::string trim(std::string value) {
         const auto first = value.find_first_not_of(" \t\r\n");
         if (first == std::string::npos) return {};
         const auto last = value.find_last_not_of(" \t\r\n");
+        // substring extraction
         return value.substr(first, last - first + 1);
     }
 
+    // String normalization (single space separation)
     std::string normalizeKey(const std::string& value) {
         std::istringstream input(trim(value));
         std::string word;
@@ -33,6 +38,7 @@ namespace {
         return result;
     }
 
+    // Dividing comma-separated strings into lists (1, 2 -> {1, 2})
     std::vector<std::string> split(const std::string& value) {
         std::vector<std::string> result;
         std::istringstream stream(value);
@@ -44,6 +50,7 @@ namespace {
         return result;
     }
 
+    // String to double, with validation
     double parseDouble(const std::string& text) {
         std::istringstream stream(text);
         stream.imbue(std::locale::classic());
@@ -55,6 +62,7 @@ namespace {
         return value;
     }
 
+    // String to size_t (non-negative integer)
     std::size_t parseSize(const std::string& text) {
         std::size_t value = 0;
         const auto [end, error] = std::from_chars(
@@ -68,6 +76,7 @@ namespace {
         return value;
     }
 
+    // String to bool
     bool parseBool(const std::string& text) {
         const auto value = trim(text);
         if (value == "true" || value == "True" || value == "TRUE" || value == "1") return true;
@@ -75,12 +84,11 @@ namespace {
         throw std::runtime_error("Invalid boolean value '" + text + "'");
     }
 
-    void parseOutputSetting(
-        const std::string& text,
-        const std::string& name,
-        bool& enabled,
-        std::size_t& interval
-    ) {
+    // Output configuration extraction (format: true/false, <saving_interval>)
+    void parseOutputSetting(const std::string& text,
+                            const std::string& name,
+                                  bool&        enabled,
+                                  std::size_t& interval) {
         std::string normalized = text;
         std::replace(normalized.begin(), normalized.end(), ',', ' ');
         std::istringstream input(normalized);
@@ -92,7 +100,7 @@ namespace {
                 "Expected '" + name + " = <bool>, <interval>'"
             );
         }
-        enabled = parseBool(tokens[0]);
+        enabled = parseBool(tokens[0]); // output activation
         if (!enabled) {
             interval = 0;
             return;
@@ -102,12 +110,13 @@ namespace {
                 "Enabled " + name + " output requires a save interval"
             );
         }
-        interval = parseSize(tokens[1]);
+        interval = parseSize(tokens[1]); // output save interval
         if (interval == 0) {
             throw std::runtime_error(name + " output interval must be positive");
         }
     }
 
+    // Reader for points coordinates, string -> array3 (format: (x, y, z))
     std::vector<std::array<double, 3>> parsePoints(const std::string& text) {
         std::vector<std::array<double, 3>> points;
         std::size_t position = 0;
@@ -139,6 +148,7 @@ namespace {
         return points;
     }
 
+    // Reader for Boundary Patches
     std::size_t parsePatch(const std::string& name) {
         if (name == "xmin") return static_cast<std::size_t>(CartesianPatch::XMin);
         if (name == "xmax") return static_cast<std::size_t>(CartesianPatch::XMax);
@@ -149,12 +159,14 @@ namespace {
         throw std::runtime_error("Unknown Cartesian boundary patch '" + name + "'");
     }
 
+    // Reader for Boundary Types
     BoundaryType parseBoundaryType(const std::string& text) {
         if (text == "Dirichlet") return BoundaryType::Dirichlet;
         if (text == "Neumann") return BoundaryType::Neumann;
         throw std::runtime_error("Unknown boundary type '" + text + "'");
     }
 
+    // File finder
     std::filesystem::path findInfoFile() {
         const auto current = std::filesystem::current_path();
         const auto preferred = current / "simulation.info";
@@ -180,12 +192,15 @@ namespace {
         return discovered;
     }
 
-} // namespace
+} 
+// ====================================================================================== //
 
+// Loader (default)
 CaseReader::LoadedCase CaseReader::load() {
     return load(findInfoFile().string());
 }
 
+// Loader (with filename)
 CaseReader::LoadedCase CaseReader::load(const std::string& filename) {
     OutputConfig output;
     const auto base = read(filename, 0, output);
@@ -208,37 +223,33 @@ CaseReader::LoadedCase CaseReader::load(const std::string& filename) {
     return {std::move(config), std::move(output), std::move(mesh)};
 }
 
-SimulationConfig CaseReader::read(const std::string& filename)
-{
+// Reader (default)
+SimulationConfig CaseReader::read(const std::string& filename) {
     return read(filename, 0);
 }
 
-SimulationConfig CaseReader::read(const std::string& filename, std::size_t cellCount)
-{
+// Reader (output config generation)
+SimulationConfig CaseReader::read(const std::string& filename, std::size_t cellCount) {
     OutputConfig output;
     return read(filename, cellCount, output);
 }
 
-SimulationConfig CaseReader::read(
-    const std::string& filename,
-    std::size_t cellCount,
-    OutputConfig& output
-) {
+// Reader (output config update )
+SimulationConfig CaseReader::read(const std::string&  filename,
+                                        std::size_t   cellCount,
+                                        OutputConfig& output) {
     try {
         return readImpl(filename, cellCount, output);
     } catch (const std::exception& error) {
         throw std::runtime_error(
-            "Cannot read case file '" + filename + "': " + error.what()
-        );
+            "Cannot read case file '" + filename + "': " + error.what());
     }
 }
 
-SimulationConfig CaseReader::readImpl(
-    const std::string& filename,
-    std::size_t cellCount,
-    OutputConfig& output
-)
-{
+// MAIN READER
+SimulationConfig CaseReader::readImpl(const std::string&  filename,
+                                            std::size_t   cellCount,
+                                            OutputConfig& output) {
     std::ifstream file(filename);
     if (!file) throw std::runtime_error("Cannot open case file '" + filename + "'");
 
@@ -285,6 +296,9 @@ SimulationConfig CaseReader::readImpl(
     if (file.bad()) throw std::runtime_error("Failed reading case file '" + filename + "'");
 
     try {
+        // ------------------------------------------------------------- //
+        //                  Simulation Configuration                     //
+        // ------------------------------------------------------------- //
         output.fileName = values.at("name");
         config.type = values.at("type");
         config.meshFile = values.at("mesh");
@@ -295,6 +309,9 @@ SimulationConfig CaseReader::readImpl(
         config.density = values.count("density")
             ? parseDouble(values.at("density"))
             : 1.0;
+        // ------------------------------------------------------------- //
+        //                    Output Configuration                       //
+        // ------------------------------------------------------------- //
         output.outputDirectory = values.count("directory")
             ? values.at("directory")
             : "results";
@@ -314,7 +331,9 @@ SimulationConfig CaseReader::readImpl(
             "' in case file '" + filename + "'"
         );
     }
-
+    // ------------------------------------------------------------- //
+    //                   Timesteps Configuration                     //
+    // ------------------------------------------------------------- //
     if (config.timeSteps > 0) {
         if (config.timeStep <= 0.0) {
             throw std::runtime_error("dt must be positive when timesteps is greater than zero");
@@ -324,22 +343,76 @@ SimulationConfig CaseReader::readImpl(
         }
     }
 
+    // ------------------------------------------------------------- //
+    //                  Scalar Field Configuration                   //
+    // ------------------------------------------------------------- //
     if (!values.count("scalar fields") || !values.count("diffusivity")
-        || !values.count("initialValues")) {
+        || !values.count("initial values")) {
         throw std::runtime_error("Missing scalar-field configuration in '" + filename + "'");
     }
 
     const auto fieldNames = split(values.at("scalar fields"));
     const auto diffusivities = split(values.at("diffusivity"));
-    const auto initialValues = split(values.at("initialValues"));
+    const auto initialValues = split(values.at("initial values"));
     if (fieldNames.empty()) throw std::runtime_error("No scalar fields were configured");
     if (diffusivities.size() != fieldNames.size()) {
         throw std::runtime_error("diffusivity count does not match scalar-field count");
     }
     if (initialValues.size() != fieldNames.size()) {
-        throw std::runtime_error("initialValues count does not match scalar-field count");
+        throw std::runtime_error("initial values count does not match scalar-field count");
+    }
+    config.scalarFields.reserve(fieldNames.size());
+
+    // Generation of each Scalar Field
+    for (std::size_t field = 0; field < fieldNames.size(); ++field) {
+        const double initialValue = parseDouble(initialValues[field]);
+        const double diffusivity = parseDouble(diffusivities[field]);
+
+        ScalarField scalarField(fieldNames[field], cellCount, initialValue);
+        scalarField.fill(initialValue);
+        scalarField.setDiffusivity(diffusivity);
+
+        BoundaryConditions boundaryConditions;
+
+        for (const auto& [patch, boundary] : boundaryValues) {
+            if (boundary.first.size() != fieldNames.size()
+                || boundary.second.size() != fieldNames.size()) {
+                throw std::runtime_error(
+                    "Boundary type/value count does not match scalar-field count"
+                );
+            }
+            const auto type = parseBoundaryType(trim(boundary.first[field]));
+            boundaryConditions.set(
+                patch,
+                type,
+                boundary.second[field]
+            );
+        }
+        scalarField.setBoundaryConditions(boundaryConditions);
+
+        config.scalarFields.push_back(std::move(scalarField));
     }
 
+    // ------------------------------------------------------------- //
+    //                 Velocity Field Configuration                  //
+    // ------------------------------------------------------------- //
+    const auto initialVelocity = split(values.at("initial velocity"));
+    if (initialVelocity.size() != 3) {
+        throw std::runtime_error("missing initial velocity component");
+    }
+
+    double initialValueX = parseDouble(initialVelocity[0]);
+    double initialValueY = parseDouble(initialVelocity[1]);
+    double initialValueZ = parseDouble(initialVelocity[2]);
+
+    VectorField vectorField("Velocity", cellCount, {initialValueX,
+                                                                                initialValueY, 
+                                                                                initialValueZ});
+    config.velocity = vectorField;
+
+    // ------------------------------------------------------------- //
+    //                  CSV Writer Configuration                     //
+    // ------------------------------------------------------------- //
     if (output.writeCsv) {
         if (!values.count("csv start points") || !values.count("csv end points")
             || !values.count("csv resolution")) {
@@ -368,36 +441,6 @@ SimulationConfig CaseReader::readImpl(
                 resolution
             });
         }
-    }
-
-    config.scalarFields.reserve(fieldNames.size());
-    for (std::size_t field = 0; field < fieldNames.size(); ++field) {
-        const double initialValue = parseDouble(initialValues[field]);
-        const double diffusivity = parseDouble(diffusivities[field]);
-
-        ScalarField scalarField(fieldNames[field], cellCount, initialValue);
-        scalarField.fill(initialValue);
-        scalarField.setDiffusivity(diffusivity);
-
-        BoundaryConditions boundaryConditions;
-
-        for (const auto& [patch, boundary] : boundaryValues) {
-            if (boundary.first.size() != fieldNames.size()
-                || boundary.second.size() != fieldNames.size()) {
-                throw std::runtime_error(
-                    "Boundary type/value count does not match scalar-field count"
-                );
-            }
-            const auto type = parseBoundaryType(trim(boundary.first[field]));
-            boundaryConditions.set(
-                patch,
-                type,
-                boundary.second[field]
-            );
-        }
-        scalarField.setBoundaryConditions(boundaryConditions);
-
-        config.scalarFields.push_back(std::move(scalarField));
     }
 
     return config;

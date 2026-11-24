@@ -8,6 +8,7 @@
 #include <io/VTKConverter.hpp>
 #include <numerics/LinearSystem.hpp>
 #include <process/Diffusion.hpp>
+#include <process/Convection.hpp>
 #include <process/TimeDerivative.hpp>
 
 #include <eigen3/Eigen/IterativeLinearSolvers>

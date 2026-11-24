@@ -122,21 +122,19 @@ def main():
             
             x = [(points[i] - 1) * 2 / 99 for i in range(len(points))]
 
-            for field in selected_fields:
-                plt.plot(x, [float(row[field]) for row in rows], label=field)
+            plt.plot(x, [float(row['C1']) for row in rows], label=f"numerical, t =  {timestep/1000}")
                 
             analytical = [np.sin(np.pi * x[i] / 2) * np.exp(-np.pi**2 / 4 * timestep/1000) for i in range(len(points))]
-            plt.plot(x, analytical, label = 'analytical')
+            plt.plot(x, analytical, label = f'analytical, t =  {timestep/1000}')
 
-            plt.xlabel("x")
-            plt.ylabel("Field value")
-            title = f"Line {line_number}"
-            title += " - steady state" if timestep is None else f" - timestep {timestep}"
-            plt.title(title)
-            plt.legend()
-            plt.grid(True)
-            plt.tight_layout()
-            plt.show()
+    plt.xlabel("x")
+    plt.ylabel("Field value")
+
+    title = "Transient simulation"
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 
 if __name__ == "__main__":

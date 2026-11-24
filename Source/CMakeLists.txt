@@ -45,6 +45,7 @@ add_library(cfd_core
     src/mesh/GeometryBuilder.cpp
     src/mesh/BoundaryPatchBuilder.cpp
     src/process/Diffusion.cpp
+    src/process/Convection.cpp
     src/process/TimeDerivative.cpp
     src/process/Runner.cpp
 )

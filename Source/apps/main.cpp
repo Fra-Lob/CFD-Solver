@@ -13,7 +13,7 @@ int main() {
               << loaded.config.scalarFields.size() << " scalar field(s)\n";
 
     // Initial conditions
-    InitialConditions::setInitialConditions(loaded.mesh, loaded.config);
+    //InitialConditions::setInitialConditions(loaded.mesh, loaded.config);
 
     // Main Run
     SimulationRunner::run(loaded.mesh, loaded.config, loaded.output);

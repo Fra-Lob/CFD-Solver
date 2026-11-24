@@ -49,7 +49,7 @@ void SimulationRunner::run(const Mesh&             mesh,
     }
 
     // solver's settings
-    Eigen::ConjugateGradient<Eigen::SparseMatrix<double>> solver;
+    Eigen::BiCGSTAB<Eigen::SparseMatrix<double>> solver;
     solver.setTolerance(config.tolerance);
     solver.setMaxIterations(static_cast<Eigen::Index>(config.maxIterations));
 
@@ -76,8 +76,15 @@ void SimulationRunner::run(const Mesh&             mesh,
                 mesh,
                 field.getDiffusivity(),
                 field.getBoundaryConditions(),
-                system
-            );
+                system);
+                
+            Convection::assemble(
+                mesh,
+                config.velocity,
+                config.density,
+                field.getBoundaryConditions(),
+                system);
+
             if (transient) {
                 TimeDerivative::assemble(
                     mesh, 

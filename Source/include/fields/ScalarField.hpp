@@ -12,10 +12,9 @@ class ScalarField {
 private:
     std::string name_;
     std::vector<double> values_;
-    BoundaryCondition bc_;
+    BoundaryConditions bc_;
     double diffusivity_ = 0.0;
     double initialValue_ = 0.0;
-    BoundaryConditions boundaryConditions_;
 
 public:
 
@@ -44,7 +43,7 @@ public:
         return values_.at(cellId);
     }
 
-    const BoundaryCondition& getBoundaryCondition() const {
+    const BoundaryConditions& getBoundaryConditions() const {
         return bc_;
     }
 
@@ -54,10 +53,6 @@ public:
 
     double getInitialValue() const {
         return initialValue_;
-    }
-
-    const BoundaryConditions& getBoundaryConditions() const {
-        return boundaryConditions_;
     }
 
 // ================================================================================//
@@ -72,15 +67,11 @@ public:
         std::fill(values_.begin(), values_.end(), value);
     }
 
-    void setBoundaryCondition(BoundaryCondition& bc) {
+    void setBoundaryConditions(const BoundaryConditions& bc) {
         bc_ = bc;
     }
 
     void setDiffusivity(double diffusivity) {
         diffusivity_ = diffusivity;
-    }
-
-    void setBoundaryConditions(const BoundaryConditions& boundaryConditions) {
-        boundaryConditions_ = boundaryConditions;
     }
 };
