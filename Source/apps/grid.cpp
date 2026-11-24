@@ -13,7 +13,7 @@ int main() {
     // Mesh configuration
     MeshConfig config{
         2.0, 1.0, 1.0,
-        10, 5, 5
+        100, 5, 5
     };
 
     // Generate mesh

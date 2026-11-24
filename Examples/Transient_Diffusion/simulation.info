@@ -5,20 +5,20 @@
 name = Transient_Diffusion.vtu
 type = scalarTransport
 mesh = Box
-scalar fields = C1, C2
+scalar fields = C1
 
 #==========================================================#
 #                        Physics                           #
 #==========================================================#
-diffusivity = 1.0, 1.0
+diffusivity = 1.0
 density = 1.0
 
 #==========================================================#
 #                          Time                            #
 #==========================================================#
-initialValues = 300.0, 150.0
-dt = 1
-timesteps = 10
+initialValues = 100.0
+dt = 0.001
+timesteps = 100
 
 #==========================================================#
 #                    Solver settings                       #
@@ -30,35 +30,35 @@ maxIterations = 10000
 #                       Boundary                           #
 #==========================================================#
 xmin
-type  = Dirichlet, Neumann
-value =     100.0,     0.0
+type  = Dirichlet
+value =       0.0
 
 xmax
-type  = Dirichlet, Dirichlet
-value =       0.0,      10.0
+type  = Dirichlet
+value =       0.0
 
 ymin
-type  = Neumann, Neumann
-value =     0.0,     0.0
+type  = Neumann
+value =     0.0
 
 ymax
-type  = Neumann, Neumann
-value =     0.0,     0.0
+type  = Neumann
+value =     0.0
 
 zmin
-type  = Neumann, Dirichlet
-value =     0.0,       2.0
+type  = Neumann
+value =     0.0
 
 zmax
-type  = Neumann, Neumann
-value =     0.0,     0.0
+type  = Neumann
+value =     0.0
 
 #==========================================================#
 #                         Output                           #
 #==========================================================#
 directory = results
-vtk = true, 5
-csv = true, 5
-csv start points = (0., 0.5, 0.5), (1., 0., 0.5)
-csv end   points = (2., 0.5, 0.5), (1., 1., 0.5)
-csv resolution   = 100, 10
+vtk = true, 50
+csv = true, 50
+csv start points = (0., 0.5, 0.5)
+csv end   points = (2., 0.5, 0.5)
+csv resolution   = 100

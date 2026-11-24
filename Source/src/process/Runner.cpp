@@ -1,55 +1,43 @@
 #include <process/Runner.hpp>
 
-#include <io/CSVExporter.hpp>
-#include <io/VTKConverter.hpp>
-#include <numerics/LinearSystem.hpp>
-#include <process/Diffusion.hpp>
-#include <process/TimeDerivative.hpp>
-
-#include <eigen3/Eigen/IterativeLinearSolvers>
-#include <filesystem>
-#include <iostream>
-#include <stdexcept>
-#include <string>
-
-namespace {
-
-std::string timeStampedFilename(const std::string& filename, std::size_t timeStep)
-{
-    if (timeStep == 0) return filename;
+// ========================================================================================= //
+//                              Output files' name managing                                  //
+// ========================================================================================= //
+std::string SimulationRunner::timeStampedFilename(const std::string& filename, 
+                                                        std::size_t  timeStep) {
+    if (timeStep == 0) return filename; // stationary
 
     const std::filesystem::path path(filename);
     return (path.parent_path() /
-            (path.stem().string() + "t" + std::to_string(timeStep) +
-             path.extension().string()))
-        .string();
+           (path.stem().string() + "t" + std::to_string(timeStep) +
+            path.extension().string())).string();  // <filename>t<timeStep>
 }
 
-void writeOutputs(
-    const Mesh& mesh,
-    const SimulationConfig& config,
-    const OutputConfig& output,
-    std::size_t timeStep,
-    bool writeVtk,
-    bool writeCsv
-)
-{
+// ========================================================================================= //
+//                                 Writing .vtu and .csv                                     //
+// ========================================================================================= //
+void SimulationRunner::writeOutputs(const Mesh&             mesh,
+                                    const SimulationConfig& config,
+                                    const OutputConfig&     output,
+                                          std::size_t       timeStep,
+                                          bool              writeVtk,
+                                          bool              writeCsv) {
     if (writeVtk) {
-        VTKConverter::write(mesh, timeStampedFilename(output.fileName, timeStep), config);
+        VTKConverter::write(mesh, SimulationRunner::timeStampedFilename(output.fileName, timeStep), config);
     }
     if (writeCsv) {
         CSVExporter::write(mesh, config, output, timeStep);
     }
 }
 
-}
+// ========================================================================================= //
+//                                         MAIN RUN                                          //
+// ========================================================================================= //
+void SimulationRunner::run(const Mesh&             mesh,
+                                 SimulationConfig& config,
+                           const OutputConfig&     output) {
 
-void SimulationRunner::run(
-    const Mesh& mesh,
-    SimulationConfig& config,
-    const OutputConfig& output
-)
-{
+    // transient or steady
     const bool transient = config.timeSteps > 0;
     const std::size_t steps = transient ? config.timeSteps : 1;
     const std::size_t cellCount = mesh.cells.getNumber();
@@ -59,24 +47,28 @@ void SimulationRunner::run(
     if (transient && output.writeCsv && output.csvInterval == 0) {
         throw std::invalid_argument("CSV output interval must be positive");
     }
+
+    // solver's settings
     Eigen::ConjugateGradient<Eigen::SparseMatrix<double>> solver;
     solver.setTolerance(config.tolerance);
     solver.setMaxIterations(static_cast<Eigen::Index>(config.maxIterations));
 
+    // some printings
     std::cout << (transient ? "Starting transient simulation '" : "Starting steady simulation '")
               << output.fileName << "' with " << config.scalarFields.size()
               << " scalar field(s)\n";
-    if (transient) {
-        std::cout << "Time step: " << config.timeStep
-                  << ", total steps: " << config.timeSteps << '\n';
-    }
 
+    // ----------------------------------------------------------------------------------------- //
+    //                                         Main Loop                                         //
+    // ----------------------------------------------------------------------------------------- //
     for (std::size_t step = 1; step <= steps; ++step) {
         if (transient) {
             std::cout << "Time step " << step << '/' << steps
                       << " (t = " << step * config.timeStep << ")\n";
         }
 
+        // field loop
+        // -------------------------------------------------------------------------------------- //
         for (auto& field : config.scalarFields) {
             std::cout << "  Solving field '" << field.getName() << "' ... ";
             LinearSystem system(cellCount);
@@ -88,10 +80,15 @@ void SimulationRunner::run(
             );
             if (transient) {
                 TimeDerivative::assemble(
-                    mesh, config.density, config.timeStep, field, system
+                    mesh, 
+                    config.density,
+                    config.timeStep, 
+                    field, 
+                    system
                 );
             }
 
+            // Solving
             system.finalize();
             solver.compute(system.getMatrix());
             if (solver.info() != Eigen::Success) {
@@ -115,18 +112,18 @@ void SimulationRunner::run(
             }
             std::cout << "done (" << solver.iterations() << " iterations)\n";
         }
+        // -------------------------------------------------------------------------------------- //
 
+        // Writing outputs
         const bool writeVtk = output.writeVtk &&
             (!transient || step % output.vtkInterval == 0 || step == steps);
         const bool writeCsv = output.writeCsv &&
             (!transient || step % output.csvInterval == 0 || step == steps);
         if (writeVtk || writeCsv) {
-            writeOutputs(
-                mesh, config, output, transient ? step : 0, writeVtk, writeCsv
-            );
+            SimulationRunner::writeOutputs(
+                mesh, config, output, transient ? step : 0, writeVtk, writeCsv);
             std::cout << "  Output written for "
-                      << (transient ? "time step " + std::to_string(step) : "steady state")
-                      << '\n';
+                      << (transient ? "time step " + std::to_string(step) : "steady state") << '\n';
         }
     }
 

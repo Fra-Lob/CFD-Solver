@@ -10,4 +10,5 @@ namespace constants {
 
     inline constexpr double TINY = 1e-15;
 
+    inline constexpr double PI = 3.141592265358979;
 }
